@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
@@ -35,7 +38,9 @@
   ],
   "analytics": false,
   "release": {
-    "projects": ["tag:publish:npm"],
+    "projects": [
+      "tag:publish:npm"
+    ],
     "projectsRelationship": "independent",
     "releaseTag": {
       "pattern": "{projectName}@v{version}"
@@ -59,15 +64,22 @@
   "targetDefaults": {
     "@nx/esbuild:esbuild": {
       "cache": true,
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "production",
         "^production",
         {
           "json": "{workspaceRoot}/tsconfig.json",
-          "fields": ["extends", "files", "include"]
+          "fields": [
+            "extends",
+            "files",
+            "include"
+          ]
         }
       ]
     }
-  }
+  },
+  "nxCloudId": "6a6843edd6e7fd96d5183a2b"
 }
