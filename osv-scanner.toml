@@ -1,0 +1,13 @@
+[[IgnoredVulns]]
+id = "GHSA-mh99-v99m-4gvg"
+reason = """
+brace-expansion DoS via unbounded expansion length. Reachable here only
+through minimatch@3.x and minimatch@9.x, pulled in transitively by the
+jest/babel-istanbul and eslint toolchains (dev-only, not shipped, not
+attacker-reachable). The advisory's only patched release is 5.0.8, a
+semver-major jump neither minimatch@3 nor minimatch@9 can consume, so
+there is no available fix for these two instances yet. Re-run
+`osv-scanner scan -r .` after bumping nx/jest/eslint (whichever pulls in
+a minimatch major that depends on brace-expansion 5.x) to check whether
+this can be removed.
+"""
