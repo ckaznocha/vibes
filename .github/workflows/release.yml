@@ -1,0 +1,48 @@
+name: Release
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Resolve project from release tag
+        id: project
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$TAG" != *"@v"* ]]; then
+            echo "::error::Release tag '$TAG' does not match <project>@v<version>"
+            exit 1
+          fi
+          project="${TAG%@v*}"
+          publishable=$(pnpm exec nx show projects -p "tag:publish:npm" --json)
+          if ! echo "$publishable" | jq -e --arg p "$project" 'index($p) != null' >/dev/null; then
+            echo "::error::Project '$project' (parsed from tag '$TAG') is not tagged publish:npm. Publishable projects: $(echo "$publishable" | jq -c .)"
+            exit 1
+          fi
+          root=$(pnpm exec nx show project "$project" --json | jq -r '.root')
+          echo "name=$project" >> "$GITHUB_OUTPUT"
+          echo "root=$root" >> "$GITHUB_OUTPUT"
+      - run: pnpm exec nx run ${{ steps.project.outputs.name }}:lint
+      - run: pnpm exec nx run ${{ steps.project.outputs.name }}:typecheck
+      - run: pnpm exec nx run ${{ steps.project.outputs.name }}:test
+      - run: pnpm exec nx run ${{ steps.project.outputs.name }}:build
+      - run: pnpm publish --no-git-checks --provenance --access public
+        working-directory: ${{ steps.project.outputs.root }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

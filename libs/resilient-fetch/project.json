@@ -1,0 +1,33 @@
+{
+  "name": "resilient-fetch",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/resilient-fetch/src",
+  "projectType": "library",
+  "targets": {
+    "typecheck": {
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/tsconfig.spec.json",
+        "{workspaceRoot}/tsconfig.base.json"
+      ],
+      "outputs": [],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/resilient-fetch",
+        "command": "tsc -p tsconfig.spec.json --noEmit"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^production", { "externalDependencies": [] }],
+      "outputs": [],
+      "options": {
+        "command": "node --test",
+        "cwd": "libs/resilient-fetch"
+      }
+    }
+  },
+  "tags": ["scope:shared", "type:lib"]
+}

@@ -1,0 +1,10 @@
+{
+  "sources": [
+    {
+      "name": "schedule",
+      "url": "https://drafthouse.com/s/mother/v2/schedule/market/{arg}",
+      "fixture": "src/fixtures/schedule-normal.json",
+      "argHint": "a market slug, e.g. los-angeles"
+    }
+  ]
+}

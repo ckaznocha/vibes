@@ -1,0 +1,33 @@
+{
+  "name": "mcp-tool-result",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/mcp-tool-result/src",
+  "projectType": "library",
+  "targets": {
+    "typecheck": {
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/tsconfig.spec.json",
+        "{workspaceRoot}/tsconfig.base.json"
+      ],
+      "outputs": [],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/mcp-tool-result",
+        "command": "tsc -p tsconfig.spec.json --noEmit"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^production", { "externalDependencies": [] }],
+      "outputs": [],
+      "options": {
+        "command": "node --test",
+        "cwd": "libs/mcp-tool-result"
+      }
+    }
+  },
+  "tags": ["scope:shared", "type:lib"]
+}

@@ -1,0 +1,29 @@
+pre-commit:
+  parallel: false
+  commands:
+    lint:
+      glob: "*.ts"
+      run: pnpm exec eslint --fix {staged_files}
+      stage_fixed: true
+    format:
+      glob: "*.{ts,json,md,yml,yaml}"
+      run: pnpm exec prettier --write {staged_files}
+      stage_fixed: true
+    affected-checks:
+      glob: "{apps,libs}/**/*.ts"
+      # --uncommitted (not --files={staged_files}): lefthook execs `run:` commands
+      # directly rather than through a shell, so quotes in this string are inert —
+      # {staged_files} expands to N unquoted space-separated tokens no matter how
+      # it's wrapped, and nx's `--files=` flag only consumes the first one, forwarding
+      # the rest as stray positional args onto every affected task's command line
+      # (breaks tsc/node --test the moment 2+ projects' files are staged together).
+      # --uncommitted has nx compute the changed-file list itself from git, sidestepping
+      # lefthook's templating entirely.
+      run: pnpm exec nx affected -t typecheck,test --uncommitted
+    workspace-lint:
+      glob: "{package.json,pnpm-workspace.yaml,pnpm-lock.yaml,**/package.json}"
+      run: pnpm run lint:workspace
+    readme-table:
+      glob: "{apps,libs}/*/{project.json,package.json}"
+      run: pnpm run docs:table
+      stage_fixed: true

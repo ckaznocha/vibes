@@ -1,0 +1,110 @@
+{
+  "name": "tmdb-mcp",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/tmdb-mcp/src",
+  "projectType": "application",
+  "targets": {
+    "typecheck": {
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/tsconfig.spec.json",
+        "{projectRoot}/tsconfig.app.json",
+        "{workspaceRoot}/tsconfig.base.json"
+      ],
+      "outputs": [],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/tmdb-mcp",
+        "command": "tsc -p tsconfig.spec.json --noEmit"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^production", { "externalDependencies": [] }],
+      "outputs": [],
+      "options": {
+        "command": "node --test",
+        "cwd": "apps/tmdb-mcp"
+      }
+    },
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "apps/tmdb-mcp/dist",
+        "format": ["esm"],
+        "bundle": true,
+        "main": "apps/tmdb-mcp/src/main.ts",
+        "tsConfig": "apps/tmdb-mcp/tsconfig.app.json",
+        "assets": ["apps/tmdb-mcp/src/assets"],
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          },
+          "banner": { "js": "#!/usr/bin/env node" }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            },
+            "banner": { "js": "#!/usr/bin/env node" }
+          }
+        }
+      }
+    },
+    "prune-lockfile": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{workspaceRoot}/apps/tmdb-mcp/dist/package.json",
+        "{workspaceRoot}/apps/tmdb-mcp/dist/pnpm-lock.yaml"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "outputs": ["{workspaceRoot}/apps/tmdb-mcp/dist/workspace_modules"],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
+      "executor": "nx:noop"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "tmdb-mcp:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "tmdb-mcp:build:development"
+        },
+        "production": {
+          "buildTarget": "tmdb-mcp:build:production"
+        }
+      }
+    }
+  },
+  "tags": ["scope:tmdb-mcp", "type:app", "type:mcp-server"]
+}

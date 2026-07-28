@@ -1,0 +1,25 @@
+{
+  "data": {
+    "presentations": [
+      { "slug": "sinners-2025-dtla", "show": { "title": "Sinners" } },
+      { "slug": "the-thing-1982-dtla", "show": { "title": "The Thing" } }
+    ],
+    "sessions": [
+      {
+        "cinemaId": "9001",
+        "showTimeClt": "2026-07-25T19:00:00",
+        "presentationSlug": "sinners-2025-dtla"
+      },
+      {
+        "cinemaId": "9001",
+        "showTimeClt": "2026-07-26T21:30:00",
+        "presentationSlug": "the-thing-1982-dtla"
+      },
+      {
+        "cinemaId": "9002",
+        "showTimeClt": "2026-07-25T18:00:00",
+        "presentationSlug": "sinners-2025-dtla"
+      }
+    ]
+  }
+}

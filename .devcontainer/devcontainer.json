@@ -1,0 +1,19 @@
+{
+  "name": "Default Linux Universal",
+  "image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "curl https://mise.run | sh && ~/.local/bin/mise install && ~/.local/bin/mise exec -- corepack enable && ~/.local/bin/mise exec -- pnpm install && ~/.local/bin/mise exec -- lefthook install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "streetsidesoftware.code-spell-checker",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

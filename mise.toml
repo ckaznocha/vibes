@@ -1,0 +1,5 @@
+[tools]
+actionlint = "1.7.12"
+lefthook = "2.1.10"
+node = "24.18.0"
+"npm:corepack" = "0.35.0"

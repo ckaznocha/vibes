@@ -1,0 +1,41 @@
+{
+  "name": "@ckaznocha/honcho-mcp",
+  "version": "0.1.0",
+  "description": "Standalone stdio MCP server exposing a self-hosted Honcho memory instance: search, dialectic chat, context/representation, and conclusion CRUD.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "honcho",
+    "memory"
+  ],
+  "homepage": "https://github.com/ckaznocha/honcho-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/ckaznocha/honcho-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckaznocha/honcho-mcp.git",
+    "directory": "apps/honcho-mcp"
+  },
+  "license": "MIT",
+  "author": "Clifton Kaznocha",
+  "type": "module",
+  "bin": {
+    "honcho-mcp": "dist/main.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@ckaznocha/mcp-tool-result": "workspace:*",
+    "@ckaznocha/resilient-fetch": "workspace:*",
+    "@honcho-ai/sdk": "^2.2.0",
+    "@modelcontextprotocol/sdk": "^1.12.3",
+    "zod": "^4.4.3"
+  }
+}

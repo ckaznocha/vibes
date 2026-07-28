@@ -1,0 +1,35 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - ckaznocha
+    reviewers:
+      - ckaznocha
+    commit-message:
+      prefix: "automated"
+      include: "scope"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - ckaznocha
+    reviewers:
+      - ckaznocha
+    commit-message:
+      prefix: "automated"
+      include: "scope"
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - ckaznocha
+    reviewers:
+      - ckaznocha
+    commit-message:
+      prefix: "automated"
+      include: "scope"

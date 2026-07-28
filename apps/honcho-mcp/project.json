@@ -1,0 +1,110 @@
+{
+  "name": "honcho-mcp",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/honcho-mcp/src",
+  "projectType": "application",
+  "targets": {
+    "typecheck": {
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/tsconfig.spec.json",
+        "{projectRoot}/tsconfig.app.json",
+        "{workspaceRoot}/tsconfig.base.json"
+      ],
+      "outputs": [],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/honcho-mcp",
+        "command": "tsc -p tsconfig.spec.json --noEmit"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^production", { "externalDependencies": [] }],
+      "outputs": [],
+      "options": {
+        "command": "node --test",
+        "cwd": "apps/honcho-mcp"
+      }
+    },
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "apps/honcho-mcp/dist",
+        "format": ["esm"],
+        "bundle": true,
+        "main": "apps/honcho-mcp/src/main.ts",
+        "tsConfig": "apps/honcho-mcp/tsconfig.app.json",
+        "assets": ["apps/honcho-mcp/src/assets"],
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          },
+          "banner": { "js": "#!/usr/bin/env node" }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            },
+            "banner": { "js": "#!/usr/bin/env node" }
+          }
+        }
+      }
+    },
+    "prune-lockfile": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{workspaceRoot}/apps/honcho-mcp/dist/package.json",
+        "{workspaceRoot}/apps/honcho-mcp/dist/pnpm-lock.yaml"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "outputs": ["{workspaceRoot}/apps/honcho-mcp/dist/workspace_modules"],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
+      "executor": "nx:noop"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "honcho-mcp:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "honcho-mcp:build:development"
+        },
+        "production": {
+          "buildTarget": "honcho-mcp:build:production"
+        }
+      }
+    }
+  },
+  "tags": ["scope:honcho-mcp", "type:app", "type:mcp-server", "publish:npm"]
+}

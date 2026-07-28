@@ -1,0 +1,12 @@
+{
+  "name": "@ckaznocha/gen-readme-table",
+  "version": "0.1.0",
+  "description": "Internal dev tool that regenerates the project table in the root README.md from Nx project metadata.",
+  "license": "MIT",
+  "author": "Clifton Kaznocha",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  }
+}

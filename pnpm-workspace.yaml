@@ -1,0 +1,11 @@
+packages:
+  - "apps/*"
+  - "libs/*"
+minimumReleaseAge: 1440
+verifyDepsBeforeRun: error
+strictDepBuilds: true
+allowBuilds:
+  "@swc/core": true
+  esbuild: true
+  nx: true
+  unrs-resolver: true

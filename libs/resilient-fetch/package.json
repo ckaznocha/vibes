@@ -1,0 +1,20 @@
+{
+  "name": "@ckaznocha/resilient-fetch",
+  "version": "0.1.0",
+  "description": "Retry, circuit-breaking, and concurrency/rate throttling for outbound fetch calls and arbitrary async SDK calls.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "cockatiel": "^4.0.0",
+    "p-queue": "^9.3.3"
+  }
+}

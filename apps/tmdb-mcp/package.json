@@ -1,0 +1,40 @@
+{
+  "name": "@ckaznocha/tmdb-mcp",
+  "version": "0.1.0",
+  "description": "Standalone stdio MCP server exposing The Movie Database (TMDB) lookups.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "tmdb"
+  ],
+  "homepage": "https://github.com/ckaznocha/tmdb-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/ckaznocha/tmdb-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckaznocha/tmdb-mcp.git",
+    "directory": "apps/tmdb-mcp"
+  },
+  "license": "MIT",
+  "author": "Clifton Kaznocha",
+  "type": "module",
+  "bin": {
+    "tmdb-mcp": "dist/main.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@ckaznocha/mcp-tool-result": "workspace:*",
+    "@ckaznocha/resilient-fetch": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.12.3",
+    "tmdb-ts": "^2.3.0",
+    "zod": "^4.4.3"
+  }
+}

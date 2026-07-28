@@ -1,0 +1,41 @@
+{
+  "name": "gen-readme-table",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/gen-readme-table/src",
+  "projectType": "application",
+  "targets": {
+    "typecheck": {
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/tsconfig.spec.json",
+        "{workspaceRoot}/tsconfig.base.json"
+      ],
+      "outputs": [],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/gen-readme-table",
+        "command": "tsc -p tsconfig.spec.json --noEmit"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^production", { "externalDependencies": [] }],
+      "outputs": [],
+      "options": {
+        "command": "node --test",
+        "cwd": "apps/gen-readme-table"
+      }
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node src/main.ts",
+        "cwd": "apps/gen-readme-table"
+      }
+    }
+  },
+  "tags": ["scope:gen-readme-table", "type:app"]
+}

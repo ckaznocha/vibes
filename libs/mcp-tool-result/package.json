@@ -1,0 +1,16 @@
+{
+  "name": "@ckaznocha/mcp-tool-result",
+  "version": "0.1.0",
+  "description": "Shared helpers for wrapping MCP tool handler results and errors in the SDK's response shape.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

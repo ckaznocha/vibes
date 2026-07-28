@@ -1,0 +1,39 @@
+{
+  "name": "@ckaznocha/alamo-mcp",
+  "version": "0.1.0",
+  "description": "Standalone stdio MCP server exposing Alamo Drafthouse showtime data and a booking deep link (never books anything).",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "alamo-drafthouse"
+  ],
+  "homepage": "https://github.com/ckaznocha/alamo-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/ckaznocha/alamo-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckaznocha/alamo-mcp.git",
+    "directory": "apps/alamo-mcp"
+  },
+  "license": "MIT",
+  "author": "Clifton Kaznocha",
+  "type": "module",
+  "bin": {
+    "alamo-mcp": "dist/main.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@ckaznocha/mcp-tool-result": "workspace:*",
+    "@ckaznocha/resilient-fetch": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.12.3",
+    "zod": "^4.4.3"
+  }
+}

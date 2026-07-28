@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/gen-readme-table"
+    },
+    {
+      "path": "./apps/letterboxd-mcp"
+    },
+    {
+      "path": "./apps/alamo-mcp"
+    },
+    {
+      "path": "./apps/tmdb-mcp"
+    },
+    {
+      "path": "./apps/honcho-mcp"
+    },
+    {
+      "path": "./libs/mcp-tool-result"
+    },
+    {
+      "path": "./libs/resilient-fetch"
+    }
+  ],
+  "compilerOptions": {}
+}

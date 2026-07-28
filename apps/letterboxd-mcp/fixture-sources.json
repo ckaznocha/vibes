@@ -1,0 +1,13 @@
+{
+  "sources": [
+    {
+      "name": "watchlist-page1",
+      "url": "https://letterboxd.com/{arg}/watchlist/page/1/",
+      "fixture": "src/fixtures/watchlist-normal-page1.html",
+      "headers": {
+        "User-Agent": "letterboxd-mcp/0.1.0 (+github.com/ckaznocha/letterboxd-mcp)"
+      },
+      "argHint": "a public Letterboxd username"
+    }
+  ]
+}
