@@ -21,14 +21,9 @@ jobs:
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - name: Determine affected base
-        id: base
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "base=origin/main" >> "$GITHUB_OUTPUT"
-          fi
-      - run: pnpm exec nx affected -t build,lint,test,typecheck --base=${{ steps.base.outputs.base }}
+      - uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
+      - run: pnpm exec nx affected -t build,lint,test,typecheck
       - run: pnpm run format:check
       - run: pnpm run lint:workspace
+      - run: npx nx-cloud fix-ci
+        if: always()

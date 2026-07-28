@@ -152,3 +152,10 @@ tag CI parses. Future direction worth considering as this grows: flipping `versi
 and wiring `nx release publish` into CI so tagging and publishing become fully automated
 instead of the current manual `cut-release` steps — not done yet since it touches
 CI/release infra and wasn't asked for.
+
+Nx Cloud is connected (`nx.json`'s `nxCloudId`) for remote caching and self-healing CI
+(`.github/workflows/ci.yml` runs `npx nx-cloud fix-ci` after the main task run).
+Distributed task execution / multi-agent CI (`nx-cloud start-ci-run`) is deliberately **not**
+set up — this workspace only has a couple of projects, not enough task volume to justify the
+added complexity/cost of DTE. Revisit if the workspace grows substantially (many more
+projects/apps); until then, don't add DTE just because it's available.
