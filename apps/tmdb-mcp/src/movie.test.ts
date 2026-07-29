@@ -20,7 +20,11 @@ describe("getMovieDetails", () => {
     assert.strictEqual(result.title, "The Matrix");
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.pathname, "/3/movie/603");
     assert.strictEqual(url.searchParams.has("append_to_response"), false);
   });
@@ -39,7 +43,11 @@ describe("getMovieDetails", () => {
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(
       url.searchParams.get("append_to_response"),
       "credits,videos",

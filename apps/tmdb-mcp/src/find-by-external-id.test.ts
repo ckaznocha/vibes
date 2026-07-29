@@ -29,7 +29,11 @@ describe("findByExternalId", () => {
     assert.strictEqual(result.movie_results[0]?.id, 603);
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.pathname, "/3/find/tt0133093");
     assert.strictEqual(url.searchParams.get("external_source"), "imdb_id");
   });

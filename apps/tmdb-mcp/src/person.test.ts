@@ -20,7 +20,11 @@ describe("getPersonDetails", () => {
     assert.strictEqual(result.name, "Keanu Reeves");
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.pathname, "/3/person/6193");
   });
 
@@ -37,7 +41,11 @@ describe("getPersonDetails", () => {
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(
       url.searchParams.get("append_to_response"),
       "combined_credits",
