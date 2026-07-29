@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      NX_CLOUD_CONTINUOUS_ASSIGNMENT: true
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
@@ -24,8 +25,9 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
+      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build,lint,test,typecheck"
       - run: pnpm exec nx affected -t build,lint,test,typecheck --base=$NX_BASE --head=$NX_HEAD
-      - run: pnpm run format:check
-      - run: pnpm run lint:workspace
+      - run: npx nx-cloud record -- pnpm run format:check
+      - run: npx nx-cloud record -- pnpm run lint:workspace
       - run: npx nx-cloud fix-ci
         if: always()
