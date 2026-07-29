@@ -28,7 +28,11 @@ describe("searchMovies", () => {
     assert.strictEqual(result.results[0]?.id, 603);
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.pathname, "/3/search/movie");
     assert.strictEqual(url.searchParams.get("query"), "The Matrix");
     assert.strictEqual(url.searchParams.get("year"), "1999");
@@ -46,7 +50,11 @@ describe("searchTv", () => {
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.searchParams.get("first_air_date_year"), "2022");
     assert.strictEqual(url.searchParams.has("year"), false);
   });
@@ -61,7 +69,11 @@ describe("searchTv", () => {
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.searchParams.has("first_air_date_year"), false);
   });
 });
@@ -83,7 +95,11 @@ describe("searchPeople", () => {
     assert.strictEqual(result.results[0]?.id, 6193);
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.pathname, "/3/search/person");
   });
 });
@@ -99,7 +115,11 @@ describe("searchMulti", () => {
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
-    const url = new URL(call.arguments[0]);
+    const url = new URL(
+      call.arguments[0] instanceof Request
+        ? call.arguments[0].url
+        : call.arguments[0],
+    );
     assert.strictEqual(url.pathname, "/3/search/multi");
   });
 });
