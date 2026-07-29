@@ -155,7 +155,12 @@ CI/release infra and wasn't asked for.
 
 Nx Cloud is connected (`nx.json`'s `nxCloudId`) for remote caching and self-healing CI
 (`.github/workflows/ci.yml` runs `npx nx-cloud fix-ci` after the main task run).
-Distributed task execution / multi-agent CI (`nx-cloud start-ci-run`) is deliberately **not**
-set up — this workspace only has a couple of projects, not enough task volume to justify the
-added complexity/cost of DTE. Revisit if the workspace grows substantially (many more
-projects/apps); until then, don't add DTE just because it's available.
+Distributed task execution via Nx Agents (`nx-cloud start-ci-run --distribute-on=...`) **is**
+set up — `.github/workflows/ci.yml`'s `affected` job distributes `build,lint,test,typecheck`
+across 3 `linux-medium-js` agents (defined in `.nx/workflows/agents.yaml`), specifically to get
+[flaky task detection/auto-rerun](https://nx.dev/docs/features/ci-features/flaky-tasks), which
+requires Nx Agents. `format:check` and `lint:workspace` (non-Nx commands) stay on the
+coordinator, wrapped in `nx-cloud record --` for CI visibility. This was added despite the
+workspace's small project count purely for flaky-test handling, not because task volume
+justified it — if agent cost/latency stops being worth it for that alone, revert to the plain
+`nx affected` coordinator-only job instead of scaling agent count.
