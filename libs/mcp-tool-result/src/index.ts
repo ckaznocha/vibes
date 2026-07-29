@@ -24,5 +24,3 @@ export function toolError(error: unknown): ToolResultError {
 export function toolResult(data: unknown): ToolResultOk {
   return { content: [{ text: JSON.stringify(data, null, 2), type: "text" }] };
 }
-// TEMPORARY: forces nx affected to pick up this lib for the Nx Agents CI
-// verification run. Revert before merge.
