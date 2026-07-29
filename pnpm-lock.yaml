@@ -122,8 +122,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/resilient-fetch
       '@modelcontextprotocol/sdk':
-        specifier: ^1.12.3
-        version: 1.29.0(supports-color@8.1.1)(zod@4.4.3)
+        specifier: ^1.30.0
+        version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -142,8 +142,8 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0
       '@modelcontextprotocol/sdk':
-        specifier: ^1.12.3
-        version: 1.29.0(supports-color@8.1.1)(zod@4.4.3)
+        specifier: ^1.30.0
+        version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -157,8 +157,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/resilient-fetch
       '@modelcontextprotocol/sdk':
-        specifier: ^1.12.3
-        version: 1.29.0(supports-color@8.1.1)(zod@4.4.3)
+        specifier: ^1.30.0
+        version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
       cheerio:
         specifier: ^1.0.0
         version: 1.2.0
@@ -175,8 +175,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/resilient-fetch
       '@modelcontextprotocol/sdk':
-        specifier: ^1.12.3
-        version: 1.29.0(supports-color@8.1.1)(zod@4.4.3)
+        specifier: ^1.30.0
+        version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
       tmdb-ts:
         specifier: ^2.3.0
         version: 2.3.0
@@ -1176,8 +1176,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@modelcontextprotocol/sdk@1.29.0':
-    resolution: {integrity: sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ==}
+  '@modelcontextprotocol/sdk@1.30.0':
+    resolution: {integrity: sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
@@ -2619,8 +2619,8 @@ packages:
     resolution: {integrity: sha512-PMARsyh/JtqC20HoGqlFcIlQAyqUtW4PlI1rup1uhYJtKuwAjbvWi3GQMAn+STdHum/dk8xrKfUM1+5SAwpolA==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
-  express-rate-limit@8.6.0:
-    resolution: {integrity: sha512-XKJXDsASUOo0LLtFwW5hCcQGH0N4WQc/Rn8/Pvoia+TJFOkkFPvrtW9lZOeeNcxQJspvOIERMwiRLsVFlhHEkA==}
+  express-rate-limit@8.6.1:
+    resolution: {integrity: sha512-0D493aP61w0TJ2A0wy27riRsO7FMQ7FK+KUHOKCSfPvYo0R55aiC6emCVgFUeShH0fq0ICPVzNcgoS+BsbXQCA==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>= 4.11'
@@ -5171,7 +5171,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@4.4.3)':
+  '@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.4.3)':
     dependencies:
       '@hono/node-server': 2.0.12(hono@4.12.32)
       ajv: 8.20.0
@@ -5182,7 +5182,7 @@ snapshots:
       eventsource: 3.0.7
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@8.1.1)
-      express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1)
+      express-rate-limit: 8.6.1(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1)
       hono: 4.12.32
       jose: 6.2.4
       json-schema-typed: 8.0.2
@@ -6740,7 +6740,7 @@ snapshots:
       jest-mock: 30.4.1
       jest-util: 30.4.1
 
-  express-rate-limit@8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1):
+  express-rate-limit@8.6.1(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       express: 5.2.1(supports-color@8.1.1)
