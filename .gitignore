@@ -54,3 +54,5 @@ docs/superpowers/
 .nx/migrate-runs
 
 *.log
+# Playwright MCP session artifacts
+.playwright-mcp/

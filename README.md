@@ -30,7 +30,7 @@ genuinely shared plumbing.
 
 | Project                                     | Kind | Description                                                                                                                                     |
 | ------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`alamo-mcp`](apps/alamo-mcp)               | app  | Standalone stdio MCP server exposing Alamo Drafthouse showtime data and a booking deep link (never books anything).                             |
+| [`alamo-mcp`](apps/alamo-mcp)               | app  | Standalone stdio MCP server exposing Alamo Drafthouse showtimes, theater listings, seat maps, and a booking deep link (never books anything).   |
 | [`gen-readme-table`](apps/gen-readme-table) | app  | Internal dev tool that regenerates the project table in the root README.md from Nx project metadata.                                            |
 | [`honcho-mcp`](apps/honcho-mcp)             | app  | Standalone stdio MCP server exposing a self-hosted Honcho memory instance: search, dialectic chat, context/representation, and conclusion CRUD. |
 | [`letterboxd-mcp`](apps/letterboxd-mcp)     | app  | Standalone stdio MCP server that scrapes a Letterboxd user's public watchlist.                                                                  |

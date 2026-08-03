@@ -1,0 +1,9 @@
+{
+  "data": {
+    "seatingData": {
+      "cinemaId": "9003",
+      "sessionId": "700003",
+      "screenNumber": "3"
+    }
+  }
+}

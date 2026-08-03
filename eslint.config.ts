@@ -150,24 +150,55 @@ export default tseslint.config(
     files: ["eslint.config.ts"],
   },
   {
-    // Catches a publish:npm project's package.json drifting from what its src/ actually
-    // imports (missing/obsolete/mismatched-version deps) — see the dependency-reviewer
-    // agent, which does the same check by hand for anything this rule can't reach.
+    // Catches a lib's package.json drifting from what its src/ actually imports
+    // (missing/obsolete/mismatched-version deps) — see the dependency-reviewer agent,
+    // which does the same check by hand for anything this rule can't reach.
     extends: [tseslint.configs.disableTypeChecked],
-    files: ["apps/*/package.json", "libs/*/package.json"],
+    files: ["libs/*/package.json"],
     languageOptions: {
       parser: jsoncParser,
     },
     rules: {
-      // The rule only counts a workspace dependency (e.g. an app depending on a
+      // The rule only counts a workspace dependency (e.g. a lib depending on another
       // libs/* package) if that *dependency* also has a target named in
       // `buildTargets` — libs/* projects intentionally have no "build" target (no
       // separate build step; consuming apps' esbuild bundlers read lib source
-      // directly), so the default `buildTargets: ['build']` would make every
-      // app-on-lib dependency look unused/obsolete. Every project here (apps and
-      // libs alike) does have "typecheck", whose input globs cover the same
-      // source files, so use that instead.
+      // directly), so the default `buildTargets: ['build']` would make every such
+      // dependency look unused/obsolete. Every project here does have "typecheck",
+      // whose input globs cover the same source files, so use that instead.
       "@nx/dependency-checks": ["error", { buildTargets: ["typecheck"] }],
+    },
+  },
+  {
+    // Apps bundle their `libs/*` code into `dist/main.js` (esbuild `excludeFromExternal`)
+    // but keep genuine npm packages external, so an app's `dependencies` is a real,
+    // conventional runtime dependency list — including the transitive deps of the libs it
+    // inlines (`cockatiel`/`p-queue` arrive via `libs/resilient-fetch`). That is what
+    // `includeTransitiveDependencies` enforces, and it is the check that would have caught
+    // the shipped-but-unresolvable `cockatiel` import at lint time instead of at runtime.
+    //
+    // `ignoredDependencies` holds exactly the `libs/*` packages, which must never appear in
+    // a published app's `dependencies`: they are `private: true`, so `pnpm publish` rewrites
+    // `workspace:*` to a version npm cannot resolve and `npm i` fails outright. They live in
+    // `devDependencies` instead, which is both accurate (they are build-time inputs, inlined
+    // into the bundle) and invisible to consumers.
+    extends: [tseslint.configs.disableTypeChecked],
+    files: ["apps/*/package.json"],
+    languageOptions: {
+      parser: jsoncParser,
+    },
+    rules: {
+      "@nx/dependency-checks": [
+        "error",
+        {
+          buildTargets: ["typecheck"],
+          ignoredDependencies: [
+            "@ckaznocha/mcp-tool-result",
+            "@ckaznocha/resilient-fetch",
+          ],
+          includeTransitiveDependencies: true,
+        },
+      ],
     },
   },
   {

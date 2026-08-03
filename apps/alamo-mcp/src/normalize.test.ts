@@ -6,11 +6,14 @@ import type { ScheduleFeed } from "./fetch-schedule.ts";
 import { normalizeSessions } from "./normalize.ts";
 
 const feed: ScheduleFeed = {
-  presentations: [{ show: { title: "Sinners" }, slug: "sinners-2025-dtla" }],
+  cinemas: [],
+  presentations: [
+    { show: { title: "Chrome Meridian" }, slug: "chrome-meridian" },
+  ],
   sessions: [
     {
       cinemaId: "9001",
-      presentationSlug: "sinners-2025-dtla",
+      presentationSlug: "chrome-meridian",
       showTimeClt: "2026-07-25T19:00:00",
     },
   ],
@@ -22,16 +25,17 @@ describe("normalizeSessions", () => {
     assert.deepStrictEqual(result, [
       {
         cinemaId: "9001",
-        presentationSlug: "sinners-2025-dtla",
-        sessionId: "9001|2026-07-25T19:00:00|sinners-2025-dtla",
+        presentationSlug: "chrome-meridian",
+        sessionId: "9001|2026-07-25T19:00:00|chrome-meridian",
         showTimeClt: "2026-07-25T19:00:00",
-        title: "Sinners",
+        title: "Chrome Meridian",
       },
     ]);
   });
 
   it("falls back to the presentationSlug as title when no matching presentation exists", () => {
     const orphanFeed: ScheduleFeed = {
+      cinemas: [],
       presentations: [],
       sessions: [
         {
@@ -47,13 +51,14 @@ describe("normalizeSessions", () => {
 
   it("prefers a native sessionId field over the composite key when present", () => {
     const feedWithNativeId: ScheduleFeed = {
+      cinemas: [],
       presentations: [
-        { show: { title: "Sinners" }, slug: "sinners-2025-dtla" },
+        { show: { title: "Chrome Meridian" }, slug: "chrome-meridian" },
       ],
       sessions: [
         {
           cinemaId: "9001",
-          presentationSlug: "sinners-2025-dtla",
+          presentationSlug: "chrome-meridian",
           sessionId: "native-session-id-123",
           showTimeClt: "2026-07-25T19:00:00",
         },
@@ -65,14 +70,15 @@ describe("normalizeSessions", () => {
 
   it("prefers a native id field over the composite key when sessionId is absent", () => {
     const feedWithId: ScheduleFeed = {
+      cinemas: [],
       presentations: [
-        { show: { title: "Sinners" }, slug: "sinners-2025-dtla" },
+        { show: { title: "Chrome Meridian" }, slug: "chrome-meridian" },
       ],
       sessions: [
         {
           cinemaId: "9001",
           id: "native-id-456",
-          presentationSlug: "sinners-2025-dtla",
+          presentationSlug: "chrome-meridian",
           showTimeClt: "2026-07-25T19:00:00",
         },
       ],

@@ -31,10 +31,14 @@
     "node": ">=24"
   },
   "dependencies": {
-    "@ckaznocha/mcp-tool-result": "workspace:*",
-    "@ckaznocha/resilient-fetch": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "cheerio": "^1.0.0",
+    "cockatiel": "^4.0.0",
+    "p-queue": "^9.3.3",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@ckaznocha/mcp-tool-result": "workspace:*",
+    "@ckaznocha/resilient-fetch": "workspace:*"
   }
 }

@@ -68,7 +68,7 @@ before creating the lib.
        "tags": ["scope:shared", "type:lib"]
      }
      ```
-     No `build`, `serve`, `prune`, or `copy-workspace-modules` target — this project
+     No `build` or `serve` target — this project
      never ships or runs standalone. `tags` is almost always exactly
      `["scope:shared", "type:lib"]`; only give it a single app's `scope:<project>`
      instead of `scope:shared` in the rare case it's genuinely private to one app (at
@@ -118,18 +118,36 @@ before creating the lib.
      already; it should already be fixed workspace-wide, but if `nx run <app>:lint`
      reports `"A project tagged with type:app can only depend on libs tagged with
 type:app"`, this is why.
-   - Confirm `@nx/dependency-checks`'s rule config (in the `apps/*/package.json` /
-     `libs/*/package.json` block) has `buildTargets: ["typecheck"]`, not the rule's
-     default `["build"]` — libs here have no `build` target, and the rule only counts a
+   - Confirm `@nx/dependency-checks` is configured in two separate blocks — one for
+     `libs/*/package.json` (plain check) and one for `apps/*/package.json` (which adds
+     `includeTransitiveDependencies: true` and `ignoredDependencies` listing the `libs/*`
+     packages). Both set `buildTargets: ["typecheck"]`, not the rule's default
+     `["build"]` — libs here have no `build` target, and the rule only counts a
      dependency as "used" if the _dependency_ project also has the named target. This
      should already be set workspace-wide; don't revert it.
 6. **In each consuming app**, add `"@ckaznocha/<name>": "workspace:*"` to its
-   `package.json` `dependencies`, then `import { ... } from "@ckaznocha/<name>"` (bare
-   specifier, not a relative path) in the source file that needs it.
+   `package.json` **`devDependencies`** (not `dependencies`), then
+   `import { ... } from "@ckaznocha/<name>"` (bare specifier, not a relative path) in the
+   source file that needs it. `devDependencies` is specifically for `libs/*` packages, not
+   a general rule — ordinary npm dependencies still go in `dependencies`. `libs/*` are
+   `private: true`, so `pnpm publish` rewrites `workspace:*` to a version npm cannot
+   resolve and `npm i` of the published app fails outright; they're instead inlined into
+   the app's bundle, making `devDependencies` accurate (build-time input only). Two more
+   edits are needed for that inlining to work — see CLAUDE.md's "How a `publish:npm` app
+   is packaged":
+   - Add the lib to `excludeFromExternal` in **each consuming app's** `project.json`
+     `build` target, or esbuild leaves it as an unresolvable bare import in `dist/main.js`.
+   - Add the lib to `ignoredDependencies` in `eslint.config.ts`'s `apps/*/package.json`
+     block, or `@nx/dependency-checks` moves it back into `dependencies`.
+   - If the new lib has its own runtime `dependencies`, every consuming app must declare
+     them too (they're inlined with the lib, so they're real runtime deps of the app).
+     `includeTransitiveDependencies: true` makes lint catch this for you; run
+     `pnpm nx lint <app> --fix` and then widen the pinned version it writes to match the
+     range the lib declares.
 7. **`pnpm install`** to link the new workspace package (needed after step 2 and again
    after step 6).
 8. **Verify, in this order** — each catches a different class of the errors above:
-   `pnpm nx run-many -t typecheck,test,lint,build,prune -p <name>,<consuming-app-1>,...`,
+   `pnpm nx run-many -t typecheck,test,lint,build -p <name>,<consuming-app-1>,...`,
    then `pnpm run lint:workspace` (sherif), then `pnpm run format:check`. Run
    `npx nx reset` first if a target result looks stale (module-boundary and
    dependency-checks errors are graph-cached and can lag a package.json edit).

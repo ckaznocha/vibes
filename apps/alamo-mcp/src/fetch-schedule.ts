@@ -1,11 +1,24 @@
 import { createTtlCache } from "./cache.ts";
 
+export interface Cinema {
+  city?: string;
+  id: string;
+  latitude?: number;
+  longitude?: number;
+  name: string;
+  slug: string;
+  state?: string;
+  street1?: string;
+  timeZoneName?: string;
+}
+
 export interface Presentation {
   show: { title: string };
   slug: string;
 }
 
 export interface ScheduleFeed {
+  cinemas: Cinema[];
   presentations: Presentation[];
   sessions: Session[];
 }
@@ -62,6 +75,16 @@ export function createScheduleFetcher(
   };
 }
 
+function isValidCinema(c: unknown): c is Cinema {
+  if (!c || typeof c !== "object") return false;
+  const cinema = c as { id?: unknown; name?: unknown; slug?: unknown };
+  return (
+    typeof cinema.id === "string" &&
+    typeof cinema.name === "string" &&
+    typeof cinema.slug === "string"
+  );
+}
+
 function isValidPresentation(p: unknown): p is Presentation {
   if (!p || typeof p !== "object") return false;
   const pres = p as { show?: unknown; slug?: unknown };
@@ -84,9 +107,52 @@ function isValidSession(s: unknown): s is Session {
   );
 }
 
+function optionalNumber(value: unknown): number | undefined {
+  return typeof value === "number" ? value : undefined;
+}
+
+function optionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value !== "" ? value : undefined;
+}
+
+/**
+ * Cinema metadata is enrichment layered on top of the showtimes, so unlike
+ * presentations/sessions this parses fail-closed (drop what doesn't fit, never throw):
+ * a drifted `data.market` shape should cost callers cinema names, not every showtime in
+ * the feed.
+ */
+function parseCinemas(rawMarket: unknown): Cinema[] {
+  if (!Array.isArray(rawMarket)) return [];
+  return rawMarket.flatMap((market: unknown) => {
+    const cinemas = (market as null | { cinemas?: unknown })?.cinemas;
+    if (!Array.isArray(cinemas)) return [];
+    return cinemas.filter(isValidCinema).map((c) => {
+      const raw = c as unknown as Record<string, unknown>;
+      const city = optionalString(raw["city"]);
+      const latitude = optionalNumber(raw["latitude"]);
+      const longitude = optionalNumber(raw["longitude"]);
+      const state = optionalString(raw["state"]);
+      const street1 = optionalString(raw["street1"]);
+      const timeZoneName = optionalString(raw["timeZoneName"]);
+      return {
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        ...(city !== undefined && { city }),
+        ...(latitude !== undefined && { latitude }),
+        ...(longitude !== undefined && { longitude }),
+        ...(state !== undefined && { state }),
+        ...(street1 !== undefined && { street1 }),
+        ...(timeZoneName !== undefined && { timeZoneName }),
+      };
+    });
+  });
+}
+
 function parseFeed(raw: unknown): ScheduleFeed {
   const data = (raw as null | { data?: unknown })?.data as
-    undefined | { presentations?: unknown; sessions?: unknown };
+    | undefined
+    | { market?: unknown; presentations?: unknown; sessions?: unknown };
   if (
     !data ||
     !Array.isArray(data.presentations) ||
@@ -106,5 +172,9 @@ function parseFeed(raw: unknown): ScheduleFeed {
       "feed shape changed: a session is missing cinemaId/showTimeClt/presentationSlug",
     );
   }
-  return { presentations: data.presentations, sessions: data.sessions };
+  return {
+    cinemas: parseCinemas(data.market),
+    presentations: data.presentations,
+    sessions: data.sessions,
+  };
 }

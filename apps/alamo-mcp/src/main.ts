@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { bestSeats } from "./best-seats.ts";
 import { bookingUrl } from "./booking-url.ts";
+import { optionalEnvironment } from "./environment.ts";
 import { createScheduleFetcher } from "./fetch-schedule.ts";
 import { filterSessions } from "./get-sessions.ts";
 import { listCinemas } from "./list-cinemas.ts";
@@ -13,10 +14,13 @@ import { normalizeSessions } from "./normalize.ts";
 import { parseCacheTtlSec } from "./parse-ttl.ts";
 import { getSeatmap } from "./seatmap.ts";
 
-const DEFAULT_MARKET = process.env["ALAMO_MARKET"] ?? "los-angeles";
-const SEAT_URL_TEMPLATE = process.env["ALAMO_SEAT_URL_TEMPLATE"];
+const DEFAULT_MARKET =
+  optionalEnvironment(process.env["ALAMO_MARKET"]) ?? "austin";
+const SEAT_URL_TEMPLATE = optionalEnvironment(
+  process.env["ALAMO_SEAT_URL_TEMPLATE"],
+);
 const CACHE_TTL_SEC = parseCacheTtlSec(
-  process.env["ALAMO_SCHEDULE_CACHE_TTL_SEC"],
+  optionalEnvironment(process.env["ALAMO_SCHEDULE_CACHE_TTL_SEC"]),
 );
 
 // Alamo's schedule feed is an unofficial, undocumented API — stay conservative on
@@ -51,7 +55,9 @@ server.registerTool(
   "list_cinemas",
   {
     description:
-      "List distinct Alamo Drafthouse cinemaIds in a market with sample sessions, to identify a theater id.",
+      "List the Alamo Drafthouse theaters in a market — cinemaId, name, address, coordinates, " +
+      "and sample sessions — to identify the cinemaId to pass to get_sessions. Theaters with no " +
+      "sessions scheduled are included with sessionCount 0.",
     inputSchema: {
       market: z
         .string()
@@ -62,7 +68,7 @@ server.registerTool(
   async ({ market }) => {
     try {
       const feed = await fetchSchedule(market ?? DEFAULT_MARKET);
-      const cinemas = listCinemas(normalizeSessions(feed));
+      const cinemas = listCinemas(normalizeSessions(feed), feed.cinemas);
       return toolResult({ cinemas });
     } catch (error) {
       return toolError(error);
@@ -106,14 +112,21 @@ server.registerTool(
   "get_seatmap",
   {
     description:
-      "Get the seat map for a session. Experimental: requires ALAMO_SEAT_URL_TEMPLATE to be configured.",
+      "Get the seat map for a session: every seat with its row, grid position, status " +
+      "(available/unavailable), and style. Pass the cinemaId and sessionId from the same " +
+      "get_sessions entry. Read-only — reporting a seat as available never holds or books it.",
     inputSchema: {
+      cinemaId: z
+        .string()
+        .describe("cinemaId of the session, as returned by get_sessions"),
       sessionId: z.string().describe("Session id as returned by get_sessions"),
     },
   },
-  async ({ sessionId }) => {
+  async ({ cinemaId, sessionId }) => {
     try {
       const seats = await getSeatmap({
+        cinemaId,
+        fetchImpl,
         sessionId,
         ...(SEAT_URL_TEMPLATE !== undefined && {
           seatUrlTemplate: SEAT_URL_TEMPLATE,
@@ -130,8 +143,13 @@ server.registerTool(
   "best_seats",
   {
     description:
-      "Get the best-scored available seats for a session (center-of-house heuristic). Experimental, same requirement as get_seatmap.",
+      "Get the best-scored available seats for a session, ranked by a center-of-house " +
+      "heuristic (horizontally centered, about two-thirds back). Lower score is better. " +
+      "Read-only — this never holds or books a seat.",
     inputSchema: {
+      cinemaId: z
+        .string()
+        .describe("cinemaId of the session, as returned by get_sessions"),
       count: z
         .number()
         .int()
@@ -141,9 +159,11 @@ server.registerTool(
       sessionId: z.string().describe("Session id as returned by get_sessions"),
     },
   },
-  async ({ count, sessionId }) => {
+  async ({ cinemaId, count, sessionId }) => {
     try {
       const seats = await bestSeats({
+        cinemaId,
+        fetchImpl,
         sessionId,
         ...(SEAT_URL_TEMPLATE !== undefined && {
           seatUrlTemplate: SEAT_URL_TEMPLATE,

@@ -31,9 +31,10 @@ gets this workflow for free by carrying the tag; no root-level change needed her
 4. Commit the version bump: `git commit -m "<project>: bump to vX.Y.Z"`.
 5. Tag and push: `git tag <project>@vX.Y.Z && git push origin <project>@vX.Y.Z`.
 6. Create the GitHub Release from that tag: `gh release create <project>@vX.Y.Z --generate-notes`.
-   The tag name is what `release.yml`'s `if: startsWith(github.event.release.tag_name, ...)`
-   matches on — get the `<project>@v` prefix exactly right or the publish job won't run.
-7. Watch the `publish-<project>` job in Actions; it needs `secrets.NPM_TOKEN` to succeed.
+   `release.yml` parses the project name back out of the tag (everything before `@v`) and
+   fails the run if it isn't tagged `publish:npm` — get the `<project>@v` prefix exactly
+   right or the publish job errors out.
+7. Watch the `publish` job in Actions; it needs `secrets.NPM_TOKEN` to succeed.
 
 ## Guardrails
 
@@ -42,9 +43,10 @@ gets this workflow for free by carrying the tag; no root-level change needed her
   CI enforces.
 - Double-check you bumped the right project's `package.json` — a `<project>@vX.Y.Z` tag
   with a _different_ project's version bumped will publish the wrong package version.
-- If `release.yml` doesn't yet have a `publish-<project>` job for a newly `publish:npm`-
-  tagged project, that job has to be added by hand — the tag alone doesn't create CI
-  wiring, it only marks the project as intending to publish. Check `.github/workflows/release.yml`
-  for a matching job before assuming this step is automatic.
+- A newly `publish:npm`-tagged project needs no CI change: `release.yml`'s single generic
+  `publish` job resolves the project from the release tag and validates it against
+  `nx show projects -p "tag:publish:npm"`. The tag genuinely is the wiring — but that also
+  means a typo'd tag or a missing `publish:npm` tag fails the run outright rather than
+  silently skipping it.
 
 Use the `release-gatekeeper` agent before step 4 to double-check readiness.

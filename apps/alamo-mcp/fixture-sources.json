@@ -4,7 +4,13 @@
       "name": "schedule",
       "url": "https://drafthouse.com/s/mother/v2/schedule/market/{arg}",
       "fixture": "src/fixtures/schedule-normal.json",
-      "argHint": "a market slug, e.g. los-angeles"
+      "argHint": "a market slug, e.g. austin. The checked-in fixture is synthetic (fictional theaters and films) but structurally faithful, so expect every value to differ — compare shapes and key names, not content."
+    },
+    {
+      "name": "seats",
+      "url": "https://drafthouse.com/s/mother/v1/app/seats/{arg}",
+      "fixture": "src/fixtures/seatmap-normal.json",
+      "argHint": "cinemaId/sessionId of a live on-sale reserved-seating session, taken from a current schedule feed (sessions age out). The checked-in fixture is synthetic, so again compare shape, not content."
     }
   ]
 }

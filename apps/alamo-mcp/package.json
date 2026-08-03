@@ -1,7 +1,7 @@
 {
   "name": "@ckaznocha/alamo-mcp",
   "version": "0.1.0",
-  "description": "Standalone stdio MCP server exposing Alamo Drafthouse showtime data and a booking deep link (never books anything).",
+  "description": "Standalone stdio MCP server exposing Alamo Drafthouse showtimes, theater listings, seat maps, and a booking deep link (never books anything).",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -31,9 +31,13 @@
     "node": ">=24"
   },
   "dependencies": {
-    "@ckaznocha/mcp-tool-result": "workspace:*",
-    "@ckaznocha/resilient-fetch": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.30.0",
+    "cockatiel": "^4.0.0",
+    "p-queue": "^9.3.3",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@ckaznocha/mcp-tool-result": "workspace:*",
+    "@ckaznocha/resilient-fetch": "workspace:*"
   }
 }

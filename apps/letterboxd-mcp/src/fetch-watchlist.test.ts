@@ -6,7 +6,7 @@ import { fetchWatchlist, WatchlistParseError } from "./fetch-watchlist.ts";
 const NORMAL_PAGE_HTML = `
 <div class="poster-list">
   <li class="poster-container">
-    <div class="poster film-poster" data-target-link="/film/dune-part-two/" data-film-name="Dune: Part Two" data-film-release-year="2024"></div>
+    <div class="poster film-poster" data-target-link="/film/chrome-meridian/" data-film-name="Chrome Meridian" data-film-release-year="2021"></div>
   </li>
 </div>`;
 
@@ -44,7 +44,7 @@ describe("fetchWatchlist", () => {
     });
 
     assert.deepStrictEqual(films, [
-      { slug: "dune-part-two", title: "Dune: Part Two", year: 2024 },
+      { slug: "chrome-meridian", title: "Chrome Meridian", year: 2021 },
     ]);
     assert.strictEqual(fetchImpl.mock.calls.length, 2);
     const [firstFetchCall, secondFetchCall] = fetchImpl.mock.calls;

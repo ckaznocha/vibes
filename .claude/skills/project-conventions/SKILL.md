@@ -63,6 +63,22 @@ plumbing every `type:mcp-server` project needs alike, the same reasoning as
   proves the parser fails closed instead of throwing an unhandled exception or emitting
   garbage. The `regen-fixture` skill checks a project's live source against its fixtures
   for drift.
+- **Never check in real third-party content — fixtures are synthetic.** Capture a live
+  response to learn its _shape_, then replace every value before committing: fictional film
+  and show titles, fictional venue names, `example.invalid` URLs, `555-01xx` phone numbers,
+  round-number coordinates, synthetic ids. Keep the real key names, nesting, and value
+  _formats_ — that fidelity is the entire point of the fixture; the content is not.
+  A raw capture drags in copyrighted marketing copy, real addresses and phone numbers,
+  live CDN asset URLs, and third-party identifiers, none of which belong in this repo.
+  The same rule applies to values hard-coded in `.test.ts` files, not just `src/fixtures/`.
+  This workspace's shared fictional catalog is _Chrome Meridian_, _Nightjar Boulevard_, and
+  _Saltwater Reverie_ (films), _Paper Lanterns_ (TV), and _Rowan Vance_ (person) — reuse
+  them rather than inventing a new set per project. To audit before committing:
+
+  ```sh
+  git ls-files | grep -v pnpm-lock | xargs grep -linE \
+    "amazonaws\.com|img-assets|google\.com/maps|maps\.apple\.com|[0-9]{3}-[0-9]{3}-[0-9]{4}"
+  ```
 
 ## Testing
 

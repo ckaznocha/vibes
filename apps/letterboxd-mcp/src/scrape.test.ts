@@ -15,9 +15,9 @@ describe("parseWatchlistPage", () => {
     const result = parseWatchlistPage(fixture("watchlist-normal-page1.html"));
     assert.strictEqual(result.hasContainer, true);
     assert.deepStrictEqual(result.films, [
-      { slug: "dune-part-two", title: "Dune: Part Two", year: 2024 },
-      { slug: "sinners-2025", title: "Sinners", year: 2025 },
-      { slug: "the-thing", title: "The Thing", year: 1982 },
+      { slug: "chrome-meridian", title: "Chrome Meridian", year: 2021 },
+      { slug: "nightjar-boulevard", title: "Nightjar Boulevard", year: 2019 },
+      { slug: "saltwater-reverie", title: "Saltwater Reverie", year: 1978 },
     ]);
   });
 
@@ -36,10 +36,10 @@ describe("parseWatchlistPage", () => {
   });
 
   it("treats a non-numeric release year attribute as null instead of NaN", () => {
-    const html = `<div class="poster-list"><li class="poster-container"><div class="poster" data-target-link="/film/dune-part-two/" data-film-name="Dune: Part Two" data-film-release-year="unknown"></div></li></div>`;
+    const html = `<div class="poster-list"><li class="poster-container"><div class="poster" data-target-link="/film/chrome-meridian/" data-film-name="Chrome Meridian" data-film-release-year="unknown"></div></li></div>`;
     const result = parseWatchlistPage(html);
     assert.deepStrictEqual(result.films, [
-      { slug: "dune-part-two", title: "Dune: Part Two", year: null },
+      { slug: "chrome-meridian", title: "Chrome Meridian", year: null },
     ]);
   });
 });
