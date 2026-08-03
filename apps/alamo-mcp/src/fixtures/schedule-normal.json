@@ -1,25 +1,699 @@
 {
   "data": {
     "presentations": [
-      { "slug": "sinners-2025-dtla", "show": { "title": "Sinners" } },
-      { "slug": "the-thing-1982-dtla", "show": { "title": "The Thing" } }
+      {
+        "slug": "chrome-meridian",
+        "legacySlug": null,
+        "show": {
+          "slug": "chrome-meridian",
+          "legacySlug": null,
+          "title": "Chrome Meridian",
+          "vistaHoCodes": ["X000000000"],
+          "headline": "A fictional film used only for tests.",
+          "landscapeHeroImage": {
+            "uri": "https://assets.example.invalid/shows/chrome-meridian/landscape.jpg",
+            "altText": "CHROME MERIDIAN"
+          },
+          "portraitHeroImage": {
+            "uri": "https://assets.example.invalid/shows/chrome-meridian/portrait.jpg",
+            "altText": "CHROME MERIDIAN"
+          },
+          "posterImages": [
+            {
+              "uri": "https://assets.example.invalid/shows/chrome-meridian/poster.jpg",
+              "altText": "CHROME MERIDIAN"
+            }
+          ],
+          "certification": "PG-13"
+        },
+        "event": null,
+        "eventType": null,
+        "formatSlugs": ["2d-digital", "open-caption"],
+        "presentationAttributeSlugs": ["first-run"],
+        "associatedPresentationSlugs": [],
+        "openingDateClt": null,
+        "openingDateDisplay": null,
+        "superTitle": null,
+        "isHidden": false,
+        "primaryCollectionSlug": null,
+        "isAvailableForPersonalTheater": false
+      },
+      {
+        "slug": "nightjar-boulevard",
+        "legacySlug": null,
+        "show": {
+          "slug": "nightjar-boulevard",
+          "legacySlug": null,
+          "title": "Nightjar Boulevard",
+          "vistaHoCodes": ["X000000001"],
+          "headline": "A fictional film used only for tests.",
+          "landscapeHeroImage": {
+            "uri": "https://assets.example.invalid/shows/nightjar-boulevard/landscape.jpg",
+            "altText": "NIGHTJAR BOULEVARD"
+          },
+          "portraitHeroImage": {
+            "uri": "https://assets.example.invalid/shows/nightjar-boulevard/portrait.jpg",
+            "altText": "NIGHTJAR BOULEVARD"
+          },
+          "posterImages": [
+            {
+              "uri": "https://assets.example.invalid/shows/nightjar-boulevard/poster.jpg",
+              "altText": "NIGHTJAR BOULEVARD"
+            }
+          ],
+          "certification": "R"
+        },
+        "event": null,
+        "eventType": null,
+        "formatSlugs": ["2d-digital", "70mm"],
+        "presentationAttributeSlugs": ["first-run"],
+        "associatedPresentationSlugs": [],
+        "openingDateClt": null,
+        "openingDateDisplay": null,
+        "superTitle": null,
+        "isHidden": false,
+        "primaryCollectionSlug": null,
+        "isAvailableForPersonalTheater": false
+      },
+      {
+        "slug": "saltwater-reverie",
+        "legacySlug": null,
+        "show": {
+          "slug": "saltwater-reverie",
+          "legacySlug": null,
+          "title": "Saltwater Reverie",
+          "vistaHoCodes": ["X000000002"],
+          "headline": "A fictional film used only for tests.",
+          "landscapeHeroImage": {
+            "uri": "https://assets.example.invalid/shows/saltwater-reverie/landscape.jpg",
+            "altText": "SALTWATER REVERIE"
+          },
+          "portraitHeroImage": {
+            "uri": "https://assets.example.invalid/shows/saltwater-reverie/portrait.jpg",
+            "altText": "SALTWATER REVERIE"
+          },
+          "posterImages": [
+            {
+              "uri": "https://assets.example.invalid/shows/saltwater-reverie/poster.jpg",
+              "altText": "SALTWATER REVERIE"
+            }
+          ],
+          "certification": null
+        },
+        "event": null,
+        "eventType": null,
+        "formatSlugs": ["hdr"],
+        "presentationAttributeSlugs": ["advance-sales", "first-run"],
+        "associatedPresentationSlugs": [],
+        "openingDateClt": "2026-12-17",
+        "openingDateDisplay": "Dec 17",
+        "superTitle": null,
+        "isHidden": false,
+        "primaryCollectionSlug": null,
+        "isAvailableForPersonalTheater": false
+      }
+    ],
+    "relatedPresentations": [],
+    "market": [
+      {
+        "id": "1000",
+        "slug": "example-market",
+        "name": "Example Market",
+        "status": "OPEN",
+        "subscriptionProgramStatus": "OPEN",
+        "isOpenAccessSeasonPassMarket": true,
+        "isOpenForBusiness": true,
+        "isFoodPreorderRequired": false,
+        "foodPreorderAvailability": "NONE",
+        "isMaxSafetyOperation": false,
+        "cinemas": [
+          {
+            "id": "9001",
+            "loyaltyCinemaId": "1",
+            "slug": "riverbend",
+            "name": "Riverbend",
+            "status": "OPEN",
+            "timeZoneName": "America/Chicago",
+            "latitude": 40,
+            "longitude": -75,
+            "street1": "100 Example Street",
+            "street2": "",
+            "city": "Example City",
+            "state": "EX",
+            "postalCode": "99000",
+            "phone": "555-0100",
+            "email": "",
+            "heroImageUrl": "https://assets.example.invalid/venues/riverbend/hero.jpg",
+            "googleMapsUrl": "https://assets.example.invalid/asset",
+            "appleMapsUrl": "https://assets.example.invalid/asset",
+            "attachedBar": {
+              "name": "Example Bar - Riverbend",
+              "websiteUrl": "https://assets.example.invalid/riverbend/bar",
+              "slug": "riverbend-bar"
+            },
+            "isClosedCaptioningAvailable": true,
+            "isDescriptiveAudioAvailable": true,
+            "isAssistedListeningAvailable": true,
+            "menus": {
+              "theaterMenuPdf": "https://assets.example.invalid/files/venues/riverbend/example-menu.pdf"
+            },
+            "foodPreorderAvailability": "NONE",
+            "parkingNotice": "<p>Directions & Parking<br />https://assets.example.invalid/example-city/theater/riverbend#theater-directions</p>",
+            "postPurchaseNotice": {
+              "title": "Directions & Parking",
+              "description": "https://assets.example.invalid/example-city/theater/riverbend#theater-directions"
+            },
+            "isWageNoticeDisplayed": true,
+            "adyenPaymentEnabled": false
+          },
+          {
+            "id": "9002",
+            "loyaltyCinemaId": "2",
+            "slug": "northgate",
+            "name": "Northgate",
+            "status": "OPEN",
+            "timeZoneName": "America/Chicago",
+            "latitude": 41,
+            "longitude": -76,
+            "street1": "101 Example Street",
+            "street2": "",
+            "city": "Example City",
+            "state": "EX",
+            "postalCode": "99001",
+            "phone": "555-0101",
+            "email": "",
+            "heroImageUrl": "https://assets.example.invalid/venues/northgate/hero.jpg",
+            "googleMapsUrl": "https://assets.example.invalid/asset",
+            "appleMapsUrl": "https://assets.example.invalid/asset",
+            "attachedBar": {
+              "name": "Example Bar - Northgate",
+              "websiteUrl": "https://assets.example.invalid/northgate/bar",
+              "slug": "northgate-bar"
+            },
+            "isClosedCaptioningAvailable": true,
+            "isDescriptiveAudioAvailable": true,
+            "isAssistedListeningAvailable": true,
+            "menus": {
+              "theaterMenuPdf": "https://assets.example.invalid/files/venues/northgate/example-menu.pdf"
+            },
+            "foodPreorderAvailability": "NONE",
+            "parkingNotice": "<p>Directions & Parking<br />https://assets.example.invalid/example-city/theater/northgate#theater-directions</p>",
+            "postPurchaseNotice": {
+              "title": "Directions & Parking",
+              "description": "https://assets.example.invalid/example-city/theater/northgate#theater-directions"
+            },
+            "isWageNoticeDisplayed": true,
+            "adyenPaymentEnabled": false
+          },
+          {
+            "id": "9003",
+            "loyaltyCinemaId": "3",
+            "slug": "old-mill",
+            "name": "Old Mill",
+            "status": "OPEN",
+            "timeZoneName": "America/Chicago",
+            "latitude": 42,
+            "longitude": -77,
+            "street1": "102 Example Street",
+            "street2": "",
+            "city": "Example City",
+            "state": "EX",
+            "postalCode": "99002",
+            "phone": "555-0102",
+            "email": "",
+            "heroImageUrl": "https://assets.example.invalid/venues/old-mill/hero.jpg",
+            "googleMapsUrl": "https://assets.example.invalid/asset",
+            "appleMapsUrl": "https://assets.example.invalid/asset",
+            "attachedBar": {
+              "name": "Example Bar - Old Mill",
+              "websiteUrl": "https://assets.example.invalid/old-mill/bar",
+              "slug": "old-mill-bar"
+            },
+            "isClosedCaptioningAvailable": true,
+            "isDescriptiveAudioAvailable": true,
+            "isAssistedListeningAvailable": true,
+            "menus": {
+              "theaterMenuPdf": "https://assets.example.invalid/files/venues/harbor-point/example-menu.pdf"
+            },
+            "foodPreorderAvailability": "NONE",
+            "parkingNotice": "<p>Directions & Parking<br />https://assets.example.invalid/example-city/theater/harbor-point#theater-directions</p>",
+            "postPurchaseNotice": {
+              "title": "Directions & Parking",
+              "description": "https://assets.example.invalid/example-city/theater/harbor-point#theater-directions"
+            },
+            "isWageNoticeDisplayed": true,
+            "adyenPaymentEnabled": false
+          },
+          {
+            "id": "9004",
+            "loyaltyCinemaId": "4",
+            "slug": "cedar-crossing",
+            "name": "Cedar Crossing",
+            "status": "OPEN",
+            "timeZoneName": "America/Chicago",
+            "latitude": 43,
+            "longitude": -78,
+            "street1": "103 Example Street",
+            "street2": "",
+            "city": "Example City",
+            "state": "EX",
+            "postalCode": "99003",
+            "phone": "555-0103",
+            "email": "",
+            "heroImageUrl": "https://assets.example.invalid/venues/cedar-crossing/hero.jpg",
+            "googleMapsUrl": "https://assets.example.invalid/asset",
+            "appleMapsUrl": "https://assets.example.invalid/asset",
+            "attachedBar": {
+              "name": "Example Bar - Cedar Crossing",
+              "websiteUrl": "https://assets.example.invalid/cedar-crossing/bar",
+              "slug": "cedar-crossing-bar"
+            },
+            "isClosedCaptioningAvailable": true,
+            "isDescriptiveAudioAvailable": true,
+            "isAssistedListeningAvailable": true,
+            "menus": {
+              "theaterMenuPdf": "https://assets.example.invalid/files/venues/cedar-crossing/example-menu.pdf"
+            },
+            "foodPreorderAvailability": "NONE",
+            "parkingNotice": "<p>Directions & Parking<br />https://assets.example.invalid/example-city/theater/cedar-crossing#theater-directions</p>",
+            "postPurchaseNotice": {
+              "title": "Directions & Parking",
+              "description": "https://assets.example.invalid/example-city/theater/cedar-crossing#theater-directions"
+            },
+            "isWageNoticeDisplayed": true,
+            "adyenPaymentEnabled": false
+          },
+          {
+            "id": "9005",
+            "loyaltyCinemaId": "5",
+            "slug": "harbor-point",
+            "name": "Harbor Point",
+            "status": "OPEN",
+            "timeZoneName": "America/Chicago",
+            "latitude": 44,
+            "longitude": -79,
+            "street1": "104 Example Street",
+            "street2": "",
+            "city": "Example City",
+            "state": "EX",
+            "postalCode": "99004",
+            "phone": "555-0104",
+            "email": "",
+            "heroImageUrl": "https://assets.example.invalid/venues/harbor-point/hero.jpg",
+            "googleMapsUrl": "https://assets.example.invalid/asset",
+            "appleMapsUrl": "https://assets.example.invalid/asset",
+            "attachedBar": {
+              "name": "Example Bar - Harbor Point",
+              "websiteUrl": "https://assets.example.invalid/harbor-point/bar",
+              "slug": "harbor-point-bar"
+            },
+            "isClosedCaptioningAvailable": true,
+            "isDescriptiveAudioAvailable": true,
+            "isAssistedListeningAvailable": true,
+            "menus": {
+              "theaterMenuPdf": "https://assets.example.invalid/files/venues/old-mill/example-menu.pdf"
+            },
+            "foodPreorderAvailability": "NONE",
+            "parkingNotice": "<p>Directions & Parking<br />https://assets.example.invalid/example-city/theater/old-mill#theater-directions</p>",
+            "postPurchaseNotice": {
+              "title": "Directions & Parking",
+              "description": "https://assets.example.invalid/example-city/theater/old-mill#theater-directions"
+            },
+            "isWageNoticeDisplayed": true,
+            "adyenPaymentEnabled": false
+          }
+        ],
+        "marketStrings": [
+          {
+            "key": "closedCaptioning",
+            "value": "The personal closed captioning device displays feature film dialogue and other audio in the form of English-language text for individuals who are deaf or hard of hearing."
+          },
+          {
+            "key": "descriptiveAudio",
+            "value": "The descriptive audio headset provides individuals who are blind or have low vision with an English-language narration of the details of the feature presentation that can't be understood by the soundtrack alone."
+          },
+          {
+            "key": "assistedListening",
+            "value": "Upon request at the box office, we provide assistive listening headsets with amplified audio for those individuals who are hard of hearing. For guests who prefer to use their own hearing aids, neck loops, or cochlear implants, our assistive listening headsets have a 3.5mm headphone jack to connect to those devices."
+          },
+          {
+            "key": "latePolicy",
+            "value": "In order to ensure the highest quality experience for all guests, you may not enter a movie after it has started. We’d love to see you up to 30 minutes early. Running late? No worries, we will happily exchange your ticket for a different showtime or a raincheck to a future show."
+          }
+        ]
+      }
     ],
     "sessions": [
       {
         "cinemaId": "9001",
-        "showTimeClt": "2026-07-25T19:00:00",
-        "presentationSlug": "sinners-2025-dtla"
-      },
-      {
-        "cinemaId": "9001",
-        "showTimeClt": "2026-07-26T21:30:00",
-        "presentationSlug": "the-thing-1982-dtla"
+        "sessionId": "700001",
+        "presentationSlug": "chrome-meridian",
+        "legacySlug": null,
+        "status": "ONSALE",
+        "businessDateClt": "2026-12-17",
+        "showTimeClt": "2026-12-17T13:00:00",
+        "cinemaTimeZoneName": "America/Chicago",
+        "showTimeUtc": "2026-12-17T19:00:00",
+        "ticketTypesLoyaltyCount": 7,
+        "ticketTypesVoucherCount": 3,
+        "ticketTypesNormalCount": 3,
+        "reservedSeating": true,
+        "screenNumber": "1",
+        "formatSlug": "hdr",
+        "isClosedCaptioningAvailable": false,
+        "isDescriptiveAudioAvailable": false,
+        "isAssistedListeningAvailable": false,
+        "sessionAttributeSlugs": ["Atmos"],
+        "recognitionIds": [],
+        "agePolicySlug": "rated-pg-13",
+        "isHidden": false,
+        "ticketingExperience": "DEFAULT"
       },
       {
         "cinemaId": "9002",
-        "showTimeClt": "2026-07-25T18:00:00",
-        "presentationSlug": "sinners-2025-dtla"
+        "sessionId": "700002",
+        "presentationSlug": "nightjar-boulevard",
+        "legacySlug": null,
+        "status": "ONSALE",
+        "businessDateClt": "2026-12-17",
+        "showTimeClt": "2026-12-17T20:45:00",
+        "cinemaTimeZoneName": "America/Chicago",
+        "showTimeUtc": "2026-12-18T02:45:00",
+        "ticketTypesLoyaltyCount": 7,
+        "ticketTypesVoucherCount": 3,
+        "ticketTypesNormalCount": 3,
+        "reservedSeating": true,
+        "screenNumber": "2",
+        "formatSlug": "hdr",
+        "isClosedCaptioningAvailable": false,
+        "isDescriptiveAudioAvailable": false,
+        "isAssistedListeningAvailable": false,
+        "sessionAttributeSlugs": ["Atmos"],
+        "recognitionIds": [],
+        "agePolicySlug": "rated-pg-13",
+        "isHidden": false,
+        "ticketingExperience": "DEFAULT"
+      },
+      {
+        "cinemaId": "9003",
+        "sessionId": "700003",
+        "presentationSlug": "saltwater-reverie",
+        "legacySlug": null,
+        "status": "ONSALE",
+        "businessDateClt": "2026-12-17",
+        "showTimeClt": "2026-12-17T13:00:00",
+        "cinemaTimeZoneName": "America/Chicago",
+        "showTimeUtc": "2026-12-17T19:00:00",
+        "ticketTypesLoyaltyCount": 7,
+        "ticketTypesVoucherCount": 3,
+        "ticketTypesNormalCount": 3,
+        "reservedSeating": true,
+        "screenNumber": "3",
+        "formatSlug": "hdr",
+        "isClosedCaptioningAvailable": false,
+        "isDescriptiveAudioAvailable": false,
+        "isAssistedListeningAvailable": false,
+        "sessionAttributeSlugs": ["Atmos"],
+        "recognitionIds": [],
+        "agePolicySlug": "rated-pg-13",
+        "isHidden": false,
+        "ticketingExperience": "DEFAULT"
+      },
+      {
+        "cinemaId": "9001",
+        "sessionId": "700004",
+        "presentationSlug": "chrome-meridian",
+        "legacySlug": null,
+        "status": "ONSALE",
+        "businessDateClt": "2026-12-17",
+        "showTimeClt": "2026-12-17T17:00:00",
+        "cinemaTimeZoneName": "America/Chicago",
+        "showTimeUtc": "2026-12-17T23:00:00",
+        "ticketTypesLoyaltyCount": 7,
+        "ticketTypesVoucherCount": 3,
+        "ticketTypesNormalCount": 3,
+        "reservedSeating": true,
+        "screenNumber": "1",
+        "formatSlug": "hdr",
+        "isClosedCaptioningAvailable": false,
+        "isDescriptiveAudioAvailable": false,
+        "isAssistedListeningAvailable": false,
+        "sessionAttributeSlugs": ["Atmos"],
+        "recognitionIds": [],
+        "agePolicySlug": "rated-pg-13",
+        "isHidden": false,
+        "ticketingExperience": "DEFAULT"
+      },
+      {
+        "cinemaId": "9002",
+        "sessionId": "700005",
+        "presentationSlug": "nightjar-boulevard",
+        "legacySlug": null,
+        "status": "ONSALE",
+        "businessDateClt": "2026-12-17",
+        "showTimeClt": "2026-12-17T13:00:00",
+        "cinemaTimeZoneName": "America/Chicago",
+        "showTimeUtc": "2026-12-17T19:00:00",
+        "ticketTypesLoyaltyCount": 7,
+        "ticketTypesVoucherCount": 3,
+        "ticketTypesNormalCount": 3,
+        "reservedSeating": true,
+        "screenNumber": "2",
+        "formatSlug": "hdr",
+        "isClosedCaptioningAvailable": false,
+        "isDescriptiveAudioAvailable": false,
+        "isAssistedListeningAvailable": false,
+        "sessionAttributeSlugs": ["Atmos"],
+        "recognitionIds": [],
+        "agePolicySlug": "rated-pg-13",
+        "isHidden": false,
+        "ticketingExperience": "DEFAULT"
+      },
+      {
+        "cinemaId": "9003",
+        "sessionId": "700006",
+        "presentationSlug": "saltwater-reverie",
+        "legacySlug": null,
+        "status": "ONSALE",
+        "businessDateClt": "2026-12-17",
+        "showTimeClt": "2026-12-17T20:40:00",
+        "cinemaTimeZoneName": "America/Chicago",
+        "showTimeUtc": "2026-12-18T02:40:00",
+        "ticketTypesLoyaltyCount": 7,
+        "ticketTypesVoucherCount": 3,
+        "ticketTypesNormalCount": 3,
+        "reservedSeating": true,
+        "screenNumber": "3",
+        "formatSlug": "hdr",
+        "isClosedCaptioningAvailable": false,
+        "isDescriptiveAudioAvailable": false,
+        "isAssistedListeningAvailable": false,
+        "sessionAttributeSlugs": ["Atmos"],
+        "recognitionIds": [],
+        "agePolicySlug": "rated-pg-13",
+        "isHidden": false,
+        "ticketingExperience": "DEFAULT"
       }
-    ]
+    ],
+    "presentationAttributes": [
+      {
+        "slug": "first-run",
+        "name": "New Releases",
+        "description": "New Releases",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      },
+      {
+        "slug": "house-exclusive",
+        "name": "Only at the House",
+        "description": "Example specialty programming",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      },
+      {
+        "slug": "advance-sales",
+        "name": "Advance Sales",
+        "description": "Shows available for pre-sale",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      },
+      {
+        "slug": "family-friendly",
+        "name": "Family Friendly",
+        "description": "Shows that are family friendly",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      }
+    ],
+    "sessionAttributes": [
+      {
+        "slug": "35MM",
+        "name": "35MM",
+        "description": null,
+        "isUserVisible": false,
+        "isUserFilterable": false
+      },
+      {
+        "slug": "70MM",
+        "name": "70MM",
+        "description": null,
+        "isUserVisible": false,
+        "isUserFilterable": false
+      },
+      {
+        "slug": "AA",
+        "name": "All Ages",
+        "description": "Get ready for maximum family fun! Our All Ages screenings include pre-show activity sheets and crayons, a relaxed noise policy, and kids menus. All ages welcome with a parent or guardian.",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      },
+      {
+        "slug": "Atmos",
+        "name": "Dolby Atmos",
+        "description": "Dolby Atmos delivers audiences a more natural and realistic sound field, transporting them into the story with a lifelike sensory experience.",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      },
+      {
+        "slug": "BD",
+        "name": "Baby Day Show",
+        "description": "For our baby day shows, we keep the lights up a bit, and the sound down a bit, so your little one never has to know they even went to the movies!",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      },
+      {
+        "slug": "Digital",
+        "name": "Digital",
+        "description": null,
+        "isUserVisible": false,
+        "isUserFilterable": false
+      },
+      {
+        "slug": "KF",
+        "name": "Kid Friendly",
+        "description": "Grab the fam and let the fun begin! Our Kid Friendly screenings include pre-show activity sheets and crayons, a relaxed noise policy, and kids menus. Ages 3+ welcome with a parent or guardian.",
+        "isUserVisible": true,
+        "isUserFilterable": true
+      },
+      {
+        "slug": "QR Menu 2",
+        "name": "Menu Add Special Screening 2",
+        "description": "Menu Add Special Screening 2",
+        "isUserVisible": false,
+        "isUserFilterable": false
+      },
+      {
+        "slug": "QR Menu 9",
+        "name": "Menu Add Special Screening 9",
+        "description": "Menu Add Special Screening 9",
+        "isUserVisible": false,
+        "isUserFilterable": false
+      }
+    ],
+    "formats": [
+      {
+        "slug": "2d-digital",
+        "vistaSlug": "Digital",
+        "title": "2D Digital",
+        "headline": "Digital format projected using a digital projector.",
+        "description": "<p>Digital format projected using a digital projector.</p>",
+        "titleTreatmentImage": {
+          "uri": "https://assets.example.invalid/images/categories/1205/2d-tt.svg",
+          "altText": "2d tt"
+        },
+        "heroImage": null
+      },
+      {
+        "slug": "hdr",
+        "vistaSlug": "HDR by Barco",
+        "title": "HDR by Barco",
+        "headline": "Next-level technology that artfully directs light & unlocks a film's potential.",
+        "description": "<p>A next-level cinema technology from Barco that artfully directs light to unlock the full potential of every film. With darker darks, brighter brights, and a full spectrum of vibrant, life-like colors you can see every detail and feel every moment when you choose to experience extraordinary in HDR by Barco.</p>",
+        "titleTreatmentImage": {
+          "uri": "https://assets.example.invalid/images/categories/hdr/ProjectionUpdate_2025_NewMission_WebAssets_ShowpageFormatModule_v2_2025-01-22-191907_wqlj.png",
+          "altText": "Projection Update 2025 New Mission Web Assets Showpage Format Module v2"
+        },
+        "heroImage": null
+      },
+      {
+        "slug": "35mm",
+        "vistaSlug": "35mm",
+        "title": "35mm",
+        "headline": "Film print projected using film projectors.",
+        "description": "<p>The industry standard for theatrical film releases prior to digital cinema. Film print projected using film projectors.</p>",
+        "titleTreatmentImage": {
+          "uri": "https://assets.example.invalid/images/categories/1206/35mm.svg",
+          "altText": "35mm"
+        },
+        "heroImage": null
+      },
+      {
+        "slug": "70mm",
+        "vistaSlug": "70mm",
+        "title": "70mm",
+        "headline": "Film print projected using film projectors.",
+        "description": "<p>The largest-sized standard exhibition format for film. Film print projected using film projectors.</p>",
+        "titleTreatmentImage": {
+          "uri": "https://assets.example.invalid/images/categories/1209/70mm.svg",
+          "altText": "70mm"
+        },
+        "heroImage": null
+      },
+      {
+        "slug": "open-caption",
+        "vistaSlug": null,
+        "title": "Open Caption",
+        "headline": "Captioning will be displayed on the screen for the duration of the show.",
+        "description": "<p>Captioning will be displayed on the screen for the duration of the show.</p>",
+        "titleTreatmentImage": {
+          "uri": "https://assets.example.invalid/images/categories/open-caption/open-caption-tt.svg",
+          "altText": "Open caption tt"
+        },
+        "heroImage": null
+      }
+    ],
+    "agePolicies": [
+      {
+        "slug": "all-ages",
+        "name": "All Ages",
+        "description": "All minors under the age of 18 must be accompanied by an adult. Children ages 6+ admitted. Children 5 and under (including infants) are ONLY admitted during specifically designated \"All Ages\" and \"Family Friendly\" screenings."
+      },
+      {
+        "slug": "default-9003",
+        "name": "Standard (9003)",
+        "description": "Children ages 3+ admitted before 6pm.\nChildren ages 6+ admitted after 6pm.\nAll minors under the age of 18 must be accompanied by an adult."
+      },
+      {
+        "slug": "rated-g",
+        "name": "Rated G",
+        "description": "All minors under the age of 18 must be accompanied by an adult. Children ages 6+ admitted. Children 5 and under (including infants) are ONLY admitted during specifically designated \"All Ages\" and \"Family Friendly\" screenings."
+      },
+      {
+        "slug": "rated-g-adult-focus",
+        "name": "Rated G with Adult Focus",
+        "description": "All minors under the age of 18 must be accompanied by an adult. Children ages 6+ admitted. Children 5 and under (including infants) are ONLY admitted during specifically designated \"All Ages\" and \"Family Friendly\" screenings."
+      },
+      {
+        "slug": "rated-pg",
+        "name": "Rated PG",
+        "description": "All minors under the age of 18 must be accompanied by an adult. Children ages 6+ admitted. Children 5 and under (including infants) are ONLY admitted during specifically designated \"All Ages\" and \"Family Friendly\" screenings."
+      },
+      {
+        "slug": "rated-pg-13",
+        "name": "Rated PG-13 (Standard)",
+        "description": "All minors under the age of 18 must be accompanied by an adult. Children ages 6+ admitted. Children 5 and under (including infants) are ONLY admitted during specifically designated \"All Ages\" and \"Family Friendly\" screenings."
+      },
+      {
+        "slug": "rated-pg-adult-focus",
+        "name": "Rated PG with Adult Focus",
+        "description": "All minors under the age of 18 must be accompanied by an adult. Children ages 6+ admitted. Children 5 and under (including infants) are ONLY admitted during specifically designated \"All Ages\" and \"Family Friendly\" screenings."
+      },
+      {
+        "slug": "rated-r",
+        "name": "Rated R",
+        "description": "All minors under the age of 18 must be accompanied by an adult. Children ages 6+ admitted. Children 5 and under (including infants) are ONLY admitted during specifically designated \"All Ages\" and \"Family Friendly\" screenings."
+      }
+    ],
+    "queues": []
   }
 }

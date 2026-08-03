@@ -11,14 +11,14 @@ const sessions: NormalizedSession[] = [
     presentationSlug: "s",
     sessionId: "a",
     showTimeClt: "2026-07-25T19:00:00",
-    title: "Sinners",
+    title: "Chrome Meridian",
   },
   {
     cinemaId: "9002",
     presentationSlug: "s",
     sessionId: "c",
     showTimeClt: "2026-07-25T18:00:00",
-    title: "Sinners",
+    title: "Chrome Meridian",
   },
 ];
 

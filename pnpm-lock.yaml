@@ -115,74 +115,102 @@ importers:
 
   apps/alamo-mcp:
     dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.30.0
+        version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
+      cockatiel:
+        specifier: ^4.0.0
+        version: 4.0.0
+      p-queue:
+        specifier: ^9.3.3
+        version: 9.3.3
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
       '@ckaznocha/mcp-tool-result':
         specifier: workspace:*
         version: link:../../libs/mcp-tool-result
       '@ckaznocha/resilient-fetch':
         specifier: workspace:*
         version: link:../../libs/resilient-fetch
-      '@modelcontextprotocol/sdk':
-        specifier: ^1.30.0
-        version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
 
   apps/gen-readme-table: {}
 
   apps/honcho-mcp:
     dependencies:
-      '@ckaznocha/mcp-tool-result':
-        specifier: workspace:*
-        version: link:../../libs/mcp-tool-result
-      '@ckaznocha/resilient-fetch':
-        specifier: workspace:*
-        version: link:../../libs/resilient-fetch
       '@honcho-ai/sdk':
         specifier: ^2.2.0
         version: 2.2.0
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
         version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
+      cockatiel:
+        specifier: ^4.0.0
+        version: 4.0.0
+      p-queue:
+        specifier: ^9.3.3
+        version: 9.3.3
       zod:
         specifier: ^4.4.3
         version: 4.4.3
-
-  apps/letterboxd-mcp:
-    dependencies:
+    devDependencies:
       '@ckaznocha/mcp-tool-result':
         specifier: workspace:*
         version: link:../../libs/mcp-tool-result
       '@ckaznocha/resilient-fetch':
         specifier: workspace:*
         version: link:../../libs/resilient-fetch
+
+  apps/letterboxd-mcp:
+    dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
         version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
       cheerio:
         specifier: ^1.0.0
         version: 1.2.0
+      cockatiel:
+        specifier: ^4.0.0
+        version: 4.0.0
+      p-queue:
+        specifier: ^9.3.3
+        version: 9.3.3
       zod:
         specifier: ^4.4.3
         version: 4.4.3
-
-  apps/tmdb-mcp:
-    dependencies:
+    devDependencies:
       '@ckaznocha/mcp-tool-result':
         specifier: workspace:*
         version: link:../../libs/mcp-tool-result
       '@ckaznocha/resilient-fetch':
         specifier: workspace:*
         version: link:../../libs/resilient-fetch
+
+  apps/tmdb-mcp:
+    dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
         version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
+      cockatiel:
+        specifier: ^4.0.0
+        version: 4.0.0
+      p-queue:
+        specifier: ^9.3.3
+        version: 9.3.3
       tmdb-ts:
         specifier: ^2.3.0
         version: 2.3.0
       zod:
         specifier: ^4.4.3
         version: 4.4.3
+    devDependencies:
+      '@ckaznocha/mcp-tool-result':
+        specifier: workspace:*
+        version: link:../../libs/mcp-tool-result
+      '@ckaznocha/resilient-fetch':
+        specifier: workspace:*
+        version: link:../../libs/resilient-fetch
 
   libs/mcp-tool-result: {}
 

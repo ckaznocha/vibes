@@ -38,7 +38,7 @@ node apps/letterboxd-mcp/dist/main.js
 Or via npm, once published:
 
 ```sh
-npx letterboxd-mcp
+npx -y @ckaznocha/letterboxd-mcp
 ```
 
 ## MCP client config example
@@ -57,6 +57,6 @@ Or via npx, once published:
 ```json
 "letterboxd": {
   "command": "npx",
-  "args": ["-y", "letterboxd-mcp"]
+  "args": ["-y", "@ckaznocha/letterboxd-mcp"]
 }
 ```

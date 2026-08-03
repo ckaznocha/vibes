@@ -1,12 +1,12 @@
 {
   "data": {
     "presentations": [
-      { "slug": "sinners-2025-dtla", "show": { "title": "Sinners" } }
+      { "slug": "chrome-meridian", "show": { "title": "Chrome Meridian" } }
     ],
     "sessions": [
       {
         "showTimeClt": "2026-07-25T19:00:00",
-        "presentationSlug": "sinners-2025-dtla"
+        "presentationSlug": "chrome-meridian"
       }
     ]
   }

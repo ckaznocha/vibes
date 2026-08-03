@@ -12,7 +12,7 @@ describe("findByExternalId", () => {
   it("looks up by imdb id", async () => {
     const fetchImpl = mock.fn<typeof fetch>(async () =>
       makeResponse({
-        movie_results: [{ id: 603 }],
+        movie_results: [{ id: 101 }],
         person_results: [],
         tv_episode_results: [],
         tv_results: [],
@@ -26,7 +26,7 @@ describe("findByExternalId", () => {
       source: "imdb_id",
     });
 
-    assert.strictEqual(result.movie_results[0]?.id, 603);
+    assert.strictEqual(result.movie_results[0]?.id, 101);
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
     const url = new URL(

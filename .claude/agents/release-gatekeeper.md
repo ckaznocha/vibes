@@ -30,10 +30,13 @@ list --branch main --limit 5` (or ask the user to confirm if `gh` isn't authenti
 6. **Semver is justified.** A major bump should correspond to a breaking change (removed
    tool, changed input schema, changed default behavior); anything else should be
    minor/patch.
-7. **CI actually has a publish job for this project.** `grep -n "publish-" .github/workflows/release.yml`
-   — a project newly tagged `publish:npm` doesn't automatically get a CI job; if there's no
-   `publish-<project>` job, tagging and creating the release will do nothing (or fail),
-   and the CI workflow needs a new job added first.
+7. **The project is discoverable as publishable.** `release.yml` has a single generic
+   `publish` job that parses `<project>@v<version>` out of the release tag and rejects any
+   project not returned by `nx show projects -p "tag:publish:npm"` — so there is no
+   per-project CI job to look for. Verify instead that the project carries the
+   `publish:npm` tag (`nx show project <project> --json | jq .tags`) and that its
+   `package.json` has the `bin`, `files`, and `@ckaznocha/`-scoped `name` the publish step
+   depends on.
 
 ## Output
 

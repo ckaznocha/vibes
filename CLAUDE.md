@@ -33,6 +33,66 @@ content. Keep it that way: when you add root-level automation, make it query
 `nx show projects -p "tag:..."` / `nx show project <p> --json` rather than naming a
 specific project.
 
+## How a `publish:npm` app is packaged
+
+**Only `libs/*` code is bundled into the app; npm packages stay external and declared.**
+Each publishable app's esbuild `build` target sets
+`excludeFromExternal: ["@ckaznocha/mcp-tool-result", "@ckaznocha/resilient-fetch"]`, which
+inlines just those private workspace packages into `dist/main.js` (8–19KB) and leaves
+every real npm dependency to be resolved normally at runtime.
+
+This split exists for one reason: **`libs/*` packages are `private: true` and can never
+appear in a published app's `dependencies`.** `pnpm publish` rewrites `workspace:*` to a
+concrete version, npm 404s resolving it, and `npm i` fails before any code runs. Inlining
+them makes the problem disappear rather than papering over it. They stay in
+`devDependencies`, which is accurate — after bundling they are build-time inputs only.
+
+Everything else belongs in `dependencies` as usual, **including the transitive deps of the
+inlined libs**: `cockatiel` and `p-queue` arrive via `libs/resilient-fetch`, so each app
+that inlines it declares them directly. That looks redundant until you remember the
+alternative — those two being neither bundled nor declared is precisely what shipped a
+`dist/main.js` that threw `ERR_MODULE_NOT_FOUND` on startup.
+
+`@nx/dependency-checks` enforces this, in two blocks in `eslint.config.ts`:
+`libs/*/package.json` gets the plain check; `apps/*/package.json` adds
+`includeTransitiveDependencies: true` (so a lib gaining a dependency becomes a lint error
+in every consuming app, not a runtime crash) plus `ignoredDependencies` naming the two
+`libs/*` packages (so the rule never moves them into `dependencies`). Keep both — dropping
+either one re-opens a bug that already shipped once. `nx lint` autofixes a missing
+transitive dep, but pins the exact installed version; match the range the lib itself
+declares instead.
+
+Resist "simplifying" this to `thirdParty: true` (inline everything, empty `dependencies`).
+It was tried and reverted: it produces a package whose manifest discloses none of the ~30
+third-party packages actually inside the tarball, which breaks SBOM/attribution, and it
+drags in esbuild's dynamic-`require` problem — `letterboxd-mcp` died at import with
+`Dynamic require of "buffer" is not supported` (safer-buffer ← iconv-lite ← cheerio),
+needing a `createRequire` banner as a workaround. Keeping npm packages external avoids
+both. The one thing it bought — a ~25MB-smaller install — is not worth an unauditable
+artifact.
+
+One esbuild detail to preserve: `target: "node24"` matches each app's `engines.node`.
+Without an explicit target esbuild assumes `esnext`, and its handling of things like the
+`node:` import prefix is target-dependent.
+
+Before cutting any release, verify the packaging end-to-end rather than trusting the
+build: `pnpm pack` the app, then `npm install ./<tarball>` in an empty directory outside
+the workspace and actually run the installed binary — and check that no `@ckaznocha/*`
+package other than the app itself landed in `node_modules`. `nx build` succeeding says
+nothing about whether the published package resolves or even starts: this exact gap once
+shipped three apps whose `dist/main.js` externalized `cockatiel`/`p-queue` and whose
+manifests depended on unpublishable workspace packages, and `nx build` was equally happy
+to emit a `letterboxd-mcp` bundle that threw on its first import.
+
+There is deliberately **no `prune`/`prune-lockfile`/`copy-workspace-modules` target**.
+Those belong to Nx's container-deploy flow (ship `dist` + a pruned lockfile + install at
+the destination), which contradicts bundling: they were emitting a 964-line lockfile of
+packages already inlined in the bundle, plus an empty `workspace_modules/` the lockfile
+still referenced. Nothing consumed them. If a container deploy is ever wanted, reach for
+`generatePackageJson` and publish from `dist` instead — but note that Nx rewrites `main`
+to `./main.js` there while leaving `bin` pointing at `dist/main.js`, so `bin` needs
+fixing by hand if you go that route.
+
 ## Tag taxonomy
 
 Declared in each project's `project.json` `tags` array. `npm:*` tags and
@@ -55,8 +115,12 @@ Declared in each project's `project.json` `tags` array. `npm:*` tags and
    discoverable, not a name added to some root config file.
 2. If it's `type:mcp-server`, follow `project-conventions` (auto-loads when you touch its
    `src/`) and use `new-mcp-tool` to add tools.
-3. If it's `publish:npm`, `.github/workflows/release.yml` needs a `publish-<project>` job
-   added by hand — the tag alone doesn't wire up CI (`release-gatekeeper` checks for this).
+3. If it's `publish:npm`, nothing needs adding to `.github/workflows/release.yml` — it has
+   a single generic `publish` job that parses `<project>@v<version>` out of the release tag
+   and validates the project against `nx show projects -p "tag:publish:npm"`, so the tag
+   alone is what wires up CI. (This item used to say a hand-written `publish-<project>` job
+   was required; that stopped being true when `release.yml` was refactored to be
+   tag-driven.)
 4. If it's `data-source:scraping`, add a `fixture-sources.json` at its root so
    `regen-fixture` can check it for upstream drift.
 5. If it introduces a genuinely new category of thing (not just another instance of an

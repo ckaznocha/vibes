@@ -13,7 +13,7 @@ describe("searchMovies", () => {
     const fetchImpl = mock.fn<typeof fetch>(async () =>
       makeResponse({
         page: 1,
-        results: [{ id: 603 }],
+        results: [{ id: 101 }],
         total_pages: 1,
         total_results: 1,
       }),
@@ -21,11 +21,11 @@ describe("searchMovies", () => {
     const client = new TMDB("key123", { fetch: fetchImpl });
 
     const result = await searchMovies(client, {
-      query: "The Matrix",
+      query: "Chrome Meridian",
       year: 1999,
     });
 
-    assert.strictEqual(result.results[0]?.id, 603);
+    assert.strictEqual(result.results[0]?.id, 101);
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
     const url = new URL(
@@ -34,7 +34,7 @@ describe("searchMovies", () => {
         : call.arguments[0],
     );
     assert.strictEqual(url.pathname, "/3/search/movie");
-    assert.strictEqual(url.searchParams.get("query"), "The Matrix");
+    assert.strictEqual(url.searchParams.get("query"), "Chrome Meridian");
     assert.strictEqual(url.searchParams.get("year"), "1999");
   });
 });
@@ -46,7 +46,7 @@ describe("searchTv", () => {
     );
     const client = new TMDB("key123", { fetch: fetchImpl });
 
-    await searchTv(client, { query: "Severance", year: 2022 });
+    await searchTv(client, { query: "Paper Lanterns", year: 2022 });
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
@@ -65,7 +65,7 @@ describe("searchTv", () => {
     );
     const client = new TMDB("key123", { fetch: fetchImpl });
 
-    await searchTv(client, { query: "Severance" });
+    await searchTv(client, { query: "Paper Lanterns" });
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
@@ -83,16 +83,16 @@ describe("searchPeople", () => {
     const fetchImpl = mock.fn<typeof fetch>(async () =>
       makeResponse({
         page: 1,
-        results: [{ id: 6193 }],
+        results: [{ id: 303 }],
         total_pages: 1,
         total_results: 1,
       }),
     );
     const client = new TMDB("key123", { fetch: fetchImpl });
 
-    const result = await searchPeople(client, { query: "Keanu Reeves" });
+    const result = await searchPeople(client, { query: "Rowan Vance" });
 
-    assert.strictEqual(result.results[0]?.id, 6193);
+    assert.strictEqual(result.results[0]?.id, 303);
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
     const url = new URL(
@@ -111,7 +111,7 @@ describe("searchMulti", () => {
     );
     const client = new TMDB("key123", { fetch: fetchImpl });
 
-    await searchMulti(client, { query: "Matrix" });
+    await searchMulti(client, { query: "Chrome Meridian" });
 
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);

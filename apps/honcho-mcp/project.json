@@ -22,7 +22,13 @@
     "test": {
       "executor": "nx:run-commands",
       "cache": true,
-      "inputs": ["default", "^production", { "externalDependencies": [] }],
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": []
+        }
+      ],
       "outputs": [],
       "options": {
         "command": "node --test",
@@ -40,52 +46,29 @@
         "bundle": true,
         "main": "apps/honcho-mcp/src/main.ts",
         "tsConfig": "apps/honcho-mcp/tsconfig.app.json",
-        "assets": ["apps/honcho-mcp/src/assets"],
         "esbuildOptions": {
           "sourcemap": true,
-          "outExtension": {
-            ".js": ".js"
-          },
-          "banner": { "js": "#!/usr/bin/env node" }
-        }
+          "banner": {
+            "js": "#!/usr/bin/env node"
+          }
+        },
+        "target": "node24",
+        "excludeFromExternal": [
+          "@ckaznocha/mcp-tool-result",
+          "@ckaznocha/resilient-fetch"
+        ]
       },
       "configurations": {
         "development": {},
         "production": {
           "esbuildOptions": {
             "sourcemap": false,
-            "outExtension": {
-              ".js": ".js"
-            },
-            "banner": { "js": "#!/usr/bin/env node" }
+            "banner": {
+              "js": "#!/usr/bin/env node"
+            }
           }
         }
       }
-    },
-    "prune-lockfile": {
-      "dependsOn": ["build"],
-      "cache": true,
-      "executor": "@nx/js:prune-lockfile",
-      "outputs": [
-        "{workspaceRoot}/apps/honcho-mcp/dist/package.json",
-        "{workspaceRoot}/apps/honcho-mcp/dist/pnpm-lock.yaml"
-      ],
-      "options": {
-        "buildTarget": "build"
-      }
-    },
-    "copy-workspace-modules": {
-      "dependsOn": ["build"],
-      "cache": true,
-      "outputs": ["{workspaceRoot}/apps/honcho-mcp/dist/workspace_modules"],
-      "executor": "@nx/js:copy-workspace-modules",
-      "options": {
-        "buildTarget": "build"
-      }
-    },
-    "prune": {
-      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
-      "executor": "nx:noop"
     },
     "serve": {
       "continuous": true,

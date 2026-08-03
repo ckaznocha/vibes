@@ -12,22 +12,22 @@ describe("createTtlCache", () => {
   it("returns the cached value before expiry", () => {
     let now = 1000;
     const cache = createTtlCache<string>({ nowImpl: () => now, ttlSec: 10 });
-    cache.set("los-angeles", "value-1");
+    cache.set("example-market", "value-1");
     now += 5000;
-    assert.strictEqual(cache.get("los-angeles"), "value-1");
+    assert.strictEqual(cache.get("example-market"), "value-1");
   });
 
   it("returns undefined after expiry", () => {
     let now = 1000;
     const cache = createTtlCache<string>({ nowImpl: () => now, ttlSec: 10 });
-    cache.set("los-angeles", "value-1");
+    cache.set("example-market", "value-1");
     now += 10_001;
-    assert.strictEqual(cache.get("los-angeles"), undefined);
+    assert.strictEqual(cache.get("example-market"), undefined);
   });
 
   it("treats a different key as a miss", () => {
     const cache = createTtlCache<string>({ ttlSec: 10 });
-    cache.set("los-angeles", "value-1");
+    cache.set("example-market", "value-1");
     assert.strictEqual(cache.get("nyc"), undefined);
   });
 });

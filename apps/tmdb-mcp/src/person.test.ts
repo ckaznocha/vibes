@@ -11,13 +11,13 @@ function makeResponse(body: unknown) {
 describe("getPersonDetails", () => {
   it("fetches details for the given person id", async () => {
     const fetchImpl = mock.fn<typeof fetch>(async () =>
-      makeResponse({ id: 6193, name: "Keanu Reeves" }),
+      makeResponse({ id: 303, name: "Rowan Vance" }),
     );
     const client = new TMDB("key123", { fetch: fetchImpl });
 
-    const result = await getPersonDetails(client, { personId: 6193 });
+    const result = await getPersonDetails(client, { personId: 303 });
 
-    assert.strictEqual(result.name, "Keanu Reeves");
+    assert.strictEqual(result.name, "Rowan Vance");
     const [call] = fetchImpl.mock.calls;
     assert.ok(call);
     const url = new URL(
@@ -25,18 +25,18 @@ describe("getPersonDetails", () => {
         ? call.arguments[0].url
         : call.arguments[0],
     );
-    assert.strictEqual(url.pathname, "/3/person/6193");
+    assert.strictEqual(url.pathname, "/3/person/303");
   });
 
   it("forwards appendToResponse", async () => {
     const fetchImpl = mock.fn<typeof fetch>(async () =>
-      makeResponse({ id: 6193, name: "Keanu Reeves" }),
+      makeResponse({ id: 303, name: "Rowan Vance" }),
     );
     const client = new TMDB("key123", { fetch: fetchImpl });
 
     await getPersonDetails(client, {
       appendToResponse: ["combined_credits"],
-      personId: 6193,
+      personId: 303,
     });
 
     const [call] = fetchImpl.mock.calls;

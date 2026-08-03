@@ -27,7 +27,7 @@ describe("getWatchlist", () => {
       {
         ok: true,
         text: async () =>
-          `<div class="poster-list"><li class="poster-container"><div class="poster" data-target-link="/film/dune-part-two/" data-film-name="Dune: Part Two" data-film-release-year="2024"></div></li></div>`,
+          `<div class="poster-list"><li class="poster-container"><div class="poster" data-target-link="/film/chrome-meridian/" data-film-name="Chrome Meridian" data-film-release-year="2021"></div></li></div>`,
       } as Response,
       {
         ok: true,
@@ -46,10 +46,10 @@ describe("getWatchlist", () => {
 
     assert.deepStrictEqual(films, [
       {
-        letterboxdUrl: "https://letterboxd.com/film/dune-part-two/",
-        slug: "dune-part-two",
-        title: "Dune: Part Two",
-        year: 2024,
+        letterboxdUrl: "https://letterboxd.com/film/chrome-meridian/",
+        slug: "chrome-meridian",
+        title: "Chrome Meridian",
+        year: 2021,
       },
     ]);
   });

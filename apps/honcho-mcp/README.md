@@ -55,7 +55,7 @@ node apps/honcho-mcp/dist/main.js
 Or via npm, once published:
 
 ```sh
-npx honcho-mcp
+npx -y @ckaznocha/honcho-mcp
 ```
 
 ## MCP client config example
@@ -74,6 +74,6 @@ Or via npx, once published:
 ```json
 "honcho": {
   "command": "npx",
-  "args": ["-y", "honcho-mcp"]
+  "args": ["-y", "@ckaznocha/honcho-mcp"]
 }
 ```

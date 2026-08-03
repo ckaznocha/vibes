@@ -5,12 +5,16 @@ import { toolError, toolResult } from "./index.ts";
 
 describe("toolResult", () => {
   it("JSON-serializes data as pretty-printed text content", () => {
-    const result = toolResult({ films: [{ title: "The Matrix" }] });
+    const result = toolResult({ films: [{ title: "Chrome Meridian" }] });
 
     assert.deepStrictEqual(result, {
       content: [
         {
-          text: JSON.stringify({ films: [{ title: "The Matrix" }] }, null, 2),
+          text: JSON.stringify(
+            { films: [{ title: "Chrome Meridian" }] },
+            null,
+            2,
+          ),
           type: "text",
         },
       ],

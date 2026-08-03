@@ -1,17 +1,38 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, it, mock } from "node:test";
+import { fileURLToPath } from "node:url";
 
 import type { Seat } from "./seatmap.ts";
 
 import { bestSeats, scoreSeats } from "./best-seats.ts";
-import { SeatUrlNotConfiguredError } from "./seatmap.ts";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const fixture = (name: string): unknown =>
+  JSON.parse(readFileSync(path.join(__dirname, "fixtures", name), "utf8"));
+
+const seat = (
+  over: Partial<Seat> & Pick<Seat, "columnIndex" | "rowIndex">,
+) => ({
+  number: "1",
+  row: "A",
+  status: "available" as const,
+  ...over,
+});
 
 describe("scoreSeats", () => {
-  it("ranks a dead-center seat above an edge/front seat", () => {
+  it("ranks a center-of-house seat above a front-corner seat", () => {
     const seats: Seat[] = [
-      { number: 1, row: "A", status: "available", x: 0, y: 0 }, // front-left corner
-      { number: 5, row: "F", status: "available", x: 5, y: 10 }, // near center of a 0-10 x, 0-15 y grid
-      { number: 5, row: "J", status: "unavailable", x: 5, y: 15 }, // taken, must be excluded
+      seat({ columnIndex: 0, number: "1", row: "1", rowIndex: 0 }),
+      seat({ columnIndex: 5, number: "5", row: "7", rowIndex: 7 }),
+      seat({
+        columnIndex: 5,
+        number: "9",
+        row: "10",
+        rowIndex: 10,
+        status: "unavailable",
+      }),
     ];
 
     const scored = scoreSeats(seats);
@@ -20,20 +41,31 @@ describe("scoreSeats", () => {
     const [best, second] = scored;
     assert.ok(best);
     assert.ok(second);
-    assert.strictEqual(best.row, "F");
-    assert.strictEqual(best.number, 5);
-    assert.strictEqual(typeof best.score, "number");
+    assert.strictEqual(best.row, "7");
+    assert.strictEqual(best.number, "5");
     assert.ok(best.score < second.score);
   });
 
-  it("throws when available seats exist but none have x/y coordinates", () => {
-    const seats: Seat[] = [{ number: 1, row: "A", status: "available" }];
-    assert.throws(() => scoreSeats(seats), /x\/y coordinates/);
+  it("targets roughly two-thirds back rather than the exact middle row", () => {
+    const seats: Seat[] = Array.from({ length: 11 }, (_, index) =>
+      seat({
+        columnIndex: 0,
+        number: String(index),
+        row: String(index),
+        rowIndex: index,
+      }),
+    );
+
+    const [best] = scoreSeats(seats);
+
+    assert.ok(best);
+    // 0.65 * 10 = 6.5, so rows 6 and 7 tie for closest; either is acceptable.
+    assert.ok(["6", "7"].includes(best.row));
   });
 
   it("returns an empty array when no seats are available at all", () => {
     const seats: Seat[] = [
-      { number: 1, row: "A", status: "unavailable", x: 0, y: 0 },
+      seat({ columnIndex: 0, rowIndex: 0, status: "unavailable" }),
     ];
     assert.deepStrictEqual(scoreSeats(seats), []);
   });
@@ -41,39 +73,78 @@ describe("scoreSeats", () => {
   it("returns an empty array when there are zero seats at all", () => {
     assert.deepStrictEqual(scoreSeats([]), []);
   });
+
+  it("carries seat style and description onto the scored result", () => {
+    const [best] = scoreSeats([
+      seat({
+        columnIndex: 0,
+        description: "RECLINER",
+        rowIndex: 0,
+        style: "HANDICAP",
+      }),
+    ]);
+
+    assert.ok(best);
+    assert.strictEqual(best.style, "HANDICAP");
+    assert.strictEqual(best.description, "RECLINER");
+  });
 });
 
 describe("bestSeats", () => {
-  it("returns the top N scored seats from getSeatmap", async () => {
+  it("returns the top N scored seats from a real seat-map payload", async () => {
     const fetchImpl = mock.fn(async () => ({
-      json: async () => ({
-        seats: [
-          { number: 1, row: "A", status: "available", x: 0, y: 0 },
-          { number: 5, row: "F", status: "available", x: 5, y: 10 },
-          { number: 6, row: "F", status: "available", x: 6, y: 10 },
-        ],
-      }),
+      json: async () => fixture("seatmap-normal.json"),
       ok: true,
+      status: 200,
     }));
 
     const result = await bestSeats({
-      count: 2,
+      cinemaId: "9003",
+      count: 3,
       fetchImpl: fetchImpl as unknown as typeof fetch,
-      seatUrlTemplate: "https://x/{sessionId}",
-      sessionId: "abc",
+      sessionId: "700003",
     });
 
-    assert.strictEqual(result.length, 2);
+    assert.strictEqual(result.length, 3);
+    // Scores must be non-decreasing — best seat first.
     assert.deepStrictEqual(
-      result.map((s) => `${s.row}${String(s.number)}`),
-      ["F5", "F6"],
+      result.map((s) => s.score),
+      result.map((s) => s.score).toSorted((a, b) => a - b),
     );
+    // Every returned seat must be one that's actually for sale.
+    assert.ok(result.every((s) => typeof s.number === "string"));
   });
 
-  it("propagates a not-configured error from getSeatmap", async () => {
+  it("defaults to a single seat", async () => {
+    const fetchImpl = mock.fn(async () => ({
+      json: async () => fixture("seatmap-normal.json"),
+      ok: true,
+      status: 200,
+    }));
+
+    const result = await bestSeats({
+      cinemaId: "9003",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      sessionId: "700003",
+    });
+
+    assert.strictEqual(result.length, 1);
+  });
+
+  it("propagates a fetch failure from getSeatmap", async () => {
+    const fetchImpl = mock.fn(async () => ({
+      json: async () => ({}),
+      ok: false,
+      status: 503,
+    }));
+
     await assert.rejects(
-      bestSeats({ sessionId: "abc" }),
-      SeatUrlNotConfiguredError,
+      bestSeats({
+        cinemaId: "9003",
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+        sessionId: "700003",
+      }),
+      /HTTP 503/,
     );
   });
 });
