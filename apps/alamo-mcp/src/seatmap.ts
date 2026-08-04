@@ -1,17 +1,21 @@
+import type { CaptureJson } from "./browser.ts";
+
 /**
- * Seat map endpoint, confirmed against a live drafthouse.com seat-selection page:
- * `GET /s/mother/v1/app/seats/{cinemaId}/{sessionId}`. The site also sends a
- * `userSessionId` query param, but the endpoint returns the same payload without it — no
- * auth, cookie, or session priming is required. Both path params come straight off a
- * schedule-feed session (`cinemaId`, `sessionId`).
+ * Seat data is read by loading the real seat-selection page for a session and observing
+ * the request that page makes for itself. Navigating straight to the deep link is enough —
+ * no clicking through the date picker — because the page fetches seats as soon as it has
+ * a sessionId/cinemaId in the query string.
+ *
+ * Deliberately *not* a direct call to `/s/mother/v1/app/seats/...`: see the note in
+ * `browser.ts` for why every request here goes through the official interface.
  */
-export const DEFAULT_SEAT_URL_TEMPLATE =
-  "https://drafthouse.com/s/mother/v1/app/seats/{cinemaId}/{sessionId}";
+export const SEATMAP_RESPONSE = /\/s\/mother\/v1\/app\/seats\//;
 
 export interface GetSeatmapOptions {
+  businessDateClt: string;
+  capture: CaptureJson;
   cinemaId: string;
-  fetchImpl?: typeof fetch;
-  seatUrlTemplate?: string;
+  presentationSlug: string;
   sessionId: string;
 }
 
@@ -45,45 +49,49 @@ export class SeatFeedShapeError extends Error {
   }
 }
 
-export function buildSeatUrl(options: {
-  cinemaId: string;
-  seatUrlTemplate?: string;
-  sessionId: string;
-}): string {
+export async function getSeatmap(
+  options: GetSeatmapOptions & { market: string },
+): Promise<Seat[]> {
   const {
+    businessDateClt,
+    capture,
     cinemaId,
-    seatUrlTemplate = DEFAULT_SEAT_URL_TEMPLATE,
+    market,
+    presentationSlug,
     sessionId,
   } = options;
-  return seatUrlTemplate
-    .replace("{cinemaId}", () => encodeURIComponent(cinemaId))
-    .replace("{sessionId}", () => encodeURIComponent(sessionId));
+  const raw = await capture({
+    match: SEATMAP_RESPONSE,
+    url: showUrl({
+      businessDateClt,
+      cinemaId,
+      market,
+      presentationSlug,
+      sessionId,
+    }),
+  });
+  return parseSeats(raw);
 }
 
-export async function getSeatmap(options: GetSeatmapOptions): Promise<Seat[]> {
-  const { cinemaId, fetchImpl = fetch, seatUrlTemplate, sessionId } = options;
-  const url = buildSeatUrl({
+/** The seat-selection deep link, built entirely from fields the schedule feed returns. */
+export function showUrl(options: {
+  businessDateClt: string;
+  cinemaId: string;
+  market: string;
+  presentationSlug: string;
+  sessionId: string;
+}): string {
+  const { businessDateClt, cinemaId, market, presentationSlug, sessionId } =
+    options;
+  const query = new URLSearchParams({
     cinemaId,
+    date: businessDateClt,
     sessionId,
-    ...(seatUrlTemplate !== undefined && { seatUrlTemplate }),
   });
-
-  const response = await fetchImpl(url);
-  if (!response.ok) {
-    throw new Error(
-      `alamo seatmap fetch failed: HTTP ${String(response.status)} for ${url}`,
-    );
-  }
-
-  let raw: unknown;
-  try {
-    raw = await response.json();
-  } catch {
-    throw new SeatFeedShapeError(
-      `alamo seatmap fetch returned a non-JSON response body for ${url}`,
-    );
-  }
-  return parseSeats(raw);
+  return (
+    `https://drafthouse.com/${encodeURIComponent(market)}` +
+    `/show/${encodeURIComponent(presentationSlug)}?${query.toString()}`
+  );
 }
 
 /**

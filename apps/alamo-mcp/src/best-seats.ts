@@ -9,7 +9,7 @@ export interface ScoredSeat {
 }
 
 export async function bestSeats(
-  options: GetSeatmapOptions & { count?: number },
+  options: GetSeatmapOptions & { count?: number; market: string },
 ): Promise<ScoredSeat[]> {
   const { count = 1, ...seatmapOptions } = options;
   const seats = await getSeatmap(seatmapOptions);

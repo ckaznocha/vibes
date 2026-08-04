@@ -1,11 +1,12 @@
 import { toolError, toolResult } from "@ckaznocha/mcp-tool-result";
-import { createResilientFetch } from "@ckaznocha/resilient-fetch";
+import { createResilientExecutor } from "@ckaznocha/resilient-fetch";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
 import { bestSeats } from "./best-seats.ts";
 import { bookingUrl } from "./booking-url.ts";
+import { createBrowserCapture } from "./browser.ts";
 import { optionalEnvironment } from "./environment.ts";
 import { createScheduleFetcher } from "./fetch-schedule.ts";
 import { filterSessions } from "./get-sessions.ts";
@@ -16,21 +17,25 @@ import { getSeatmap } from "./seatmap.ts";
 
 const DEFAULT_MARKET =
   optionalEnvironment(process.env["ALAMO_MARKET"]) ?? "austin";
-const SEAT_URL_TEMPLATE = optionalEnvironment(
-  process.env["ALAMO_SEAT_URL_TEMPLATE"],
-);
+const CDP_URL =
+  optionalEnvironment(process.env["ALAMO_BROWSER_CDP_URL"]) ??
+  "http://localhost:9222";
 const CACHE_TTL_SEC = parseCacheTtlSec(
   optionalEnvironment(process.env["ALAMO_SCHEDULE_CACHE_TTL_SEC"]),
 );
 
-// Alamo's schedule feed is an unofficial, undocumented API — stay conservative on
-// concurrency/rate to avoid drawing attention, and lean on retry+circuit-breaking to
-// ride out its occasional transient failures.
-const fetchImpl = createResilientFetch({
-  throttle: { concurrency: 2, intervalCap: 10, intervalMs: 1000 },
+// Every Alamo request is a real page load in a real browser, so one at a time and no
+// faster than a person could click. Retry/circuit-breaking wraps the navigation rather
+// than a fetch, since there is no fetch of our own left to wrap.
+const browser = createBrowserCapture({ cdpUrl: CDP_URL });
+const execute = createResilientExecutor({
+  throttle: { concurrency: 1, intervalCap: 1, intervalMs: 2000 },
 });
+const capture: typeof browser.capture = (request) =>
+  execute(() => browser.capture(request));
+
 const fetchSchedule = createScheduleFetcher({
-  fetchImpl,
+  capture,
   ttlSec: CACHE_TTL_SEC,
 });
 
@@ -116,21 +121,42 @@ server.registerTool(
       "(available/unavailable), and style. Pass the cinemaId and sessionId from the same " +
       "get_sessions entry. Read-only — reporting a seat as available never holds or books it.",
     inputSchema: {
+      businessDateClt: z
+        .string()
+        .describe(
+          "businessDateClt of the session, as returned by get_sessions. Alamo's business " +
+            "day runs 6am-5:59am, so do not substitute the calendar date of showTimeClt.",
+        ),
       cinemaId: z
         .string()
         .describe("cinemaId of the session, as returned by get_sessions"),
+      market: z
+        .string()
+        .optional()
+        .describe(`Market slug (default "${DEFAULT_MARKET}")`),
+      presentationSlug: z
+        .string()
+        .describe(
+          "presentationSlug of the session, as returned by get_sessions",
+        ),
       sessionId: z.string().describe("Session id as returned by get_sessions"),
     },
   },
-  async ({ cinemaId, sessionId }) => {
+  async ({
+    businessDateClt,
+    cinemaId,
+    market,
+    presentationSlug,
+    sessionId,
+  }) => {
     try {
       const seats = await getSeatmap({
+        businessDateClt,
+        capture,
         cinemaId,
-        fetchImpl,
+        market: market ?? DEFAULT_MARKET,
+        presentationSlug,
         sessionId,
-        ...(SEAT_URL_TEMPLATE !== undefined && {
-          seatUrlTemplate: SEAT_URL_TEMPLATE,
-        }),
       });
       return toolResult({ seats });
     } catch (error) {
@@ -147,6 +173,12 @@ server.registerTool(
       "heuristic (horizontally centered, about two-thirds back). Lower score is better. " +
       "Read-only — this never holds or books a seat.",
     inputSchema: {
+      businessDateClt: z
+        .string()
+        .describe(
+          "businessDateClt of the session, as returned by get_sessions. Alamo's business " +
+            "day runs 6am-5:59am, so do not substitute the calendar date of showTimeClt.",
+        ),
       cinemaId: z
         .string()
         .describe("cinemaId of the session, as returned by get_sessions"),
@@ -156,18 +188,34 @@ server.registerTool(
         .positive()
         .optional()
         .describe("Number of seats to return (default 1)"),
+      market: z
+        .string()
+        .optional()
+        .describe(`Market slug (default "${DEFAULT_MARKET}")`),
+      presentationSlug: z
+        .string()
+        .describe(
+          "presentationSlug of the session, as returned by get_sessions",
+        ),
       sessionId: z.string().describe("Session id as returned by get_sessions"),
     },
   },
-  async ({ cinemaId, count, sessionId }) => {
+  async ({
+    businessDateClt,
+    cinemaId,
+    count,
+    market,
+    presentationSlug,
+    sessionId,
+  }) => {
     try {
       const seats = await bestSeats({
+        businessDateClt,
+        capture,
         cinemaId,
-        fetchImpl,
+        market: market ?? DEFAULT_MARKET,
+        presentationSlug,
         sessionId,
-        ...(SEAT_URL_TEMPLATE !== undefined && {
-          seatUrlTemplate: SEAT_URL_TEMPLATE,
-        }),
         ...(count !== undefined && { count }),
       });
       return toolResult({ seats });
@@ -207,4 +255,16 @@ server.registerTool(
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error("alamo-mcp running on stdio");
+console.error(`alamo-mcp running on stdio (browser at ${CDP_URL})`);
+
+// Close the shared page/CDP connection on shutdown so we don't leave a stray tab open
+// in the user's browser. Closing the transport and the connection drains the event loop,
+// so the process exits on its own without a hard process.exit().
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, () => {
+    void (async () => {
+      await server.close();
+      await browser.close();
+    })();
+  });
+}

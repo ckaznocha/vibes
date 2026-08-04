@@ -18,13 +18,13 @@ booking always stays a human, in-app action.
 
 ## Tools
 
-| Tool                                      | Purpose                                                                             |
-| ----------------------------------------- | ----------------------------------------------------------------------------------- |
-| `list_cinemas(market?)`                   | Theaters in a market — cinemaId, name, address, coordinates, sample sessions        |
-| `get_sessions(market?, cinemaId?)`        | Normalized showtimes, optionally filtered to a cinemaId                             |
-| `get_seatmap(cinemaId, sessionId)`        | Every seat for a session with row, grid position, status, and style                 |
-| `best_seats(cinemaId, sessionId, count?)` | Top-scored available seats (center-of-house heuristic)                              |
-| `booking_url(market?, presentationSlug)`  | Builds `https://drafthouse.com/{market}/show/{presentationSlug}` — a deep link only |
+| Tool                                                                  | Purpose                                                                             |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `list_cinemas(market?)`                                               | Theaters in a market — cinemaId, name, address, coordinates, sample sessions        |
+| `get_sessions(market?, cinemaId?)`                                    | Normalized showtimes, optionally filtered to a cinemaId                             |
+| `get_seatmap(cinemaId, sessionId, presentationSlug, businessDateClt)` | Every seat for a session with row, grid position, status, and style                 |
+| `best_seats(…same, count?)`                                           | Top-scored available seats (center-of-house heuristic)                              |
+| `booking_url(market?, presentationSlug)`                              | Builds `https://drafthouse.com/{market}/show/{presentationSlug}` — a deep link only |
 
 ## Finding a cinemaId
 
@@ -53,15 +53,63 @@ expects — drafthouse.com's own seat-selection page keys off the same value —
 so the composite fallback is defensive only, and a session that hits it won't
 work with `get_seatmap`.
 
+## How this server talks to Alamo
+
+**It doesn't call Alamo's API directly.** It drives drafthouse.com in a real
+browser and reads the JSON the page fetches for itself.
+
+That is a compliance decision, not a technical preference.
+`drafthouse.com/robots.txt` is:
+
+```
+User-agent: *
+Disallow: /s/
+```
+
+Both feeds this server needs live under `/s/`, and there is no
+robots-permitted URL that carries the data — the public pages are an empty
+SPA shell that renders entirely from those same `/s/` calls. So rather than
+hand-crafting requests to a reverse-engineered endpoint, the server loads the
+official interface and observes its own traffic:
+
+| Tool                           | Page loaded                                                    | Response read                                   |
+| ------------------------------ | -------------------------------------------------------------- | ----------------------------------------------- |
+| `list_cinemas`, `get_sessions` | `/{market}`                                                    | `/s/mother/v2/schedule/market/{market}`         |
+| `get_seatmap`, `best_seats`    | `/{market}/show/{presentationSlug}?sessionId=&cinemaId=&date=` | `/s/mother/v1/app/seats/{cinemaId}/{sessionId}` |
+
+Nothing is scraped out of the DOM; the parsed data is the same JSON the page
+itself received, so it stays typed and stable against UI changes.
+
+To be clear about what this does and doesn't settle: it makes those requests
+first-party page behavior during a normal load of the interface Alamo
+provides, rather than direct automated hits on a disallowed path. It does not
+make an unattended automated client stop being an automated client. Read the
+site's Terms and Conditions and decide for yourself before pointing this at
+anything.
+
+### Requires a browser
+
+The server attaches to an **already-running** browser over the Chrome
+DevTools Protocol — it neither downloads nor launches one, so the published
+package carries no bundled Chromium and the browser is yours, with your
+profile.
+
+```sh
+# any Chromium-based browser, headless or not
+google-chrome --remote-debugging-port=9222
+```
+
+Point `ALAMO_BROWSER_CDP_URL` at it (default `http://localhost:9222`). With no
+browser reachable, every data tool fails with a message telling you so —
+there is no direct-fetch fallback by design.
+
 ## Seat maps
 
-`get_seatmap` and `best_seats` call
-`GET /s/mother/v1/app/seats/{cinemaId}/{sessionId}`, the same endpoint
-drafthouse.com's own seat-selection page uses. It needs no auth, cookie, or
-session priming — the site sends a `userSessionId` query param, but the
-response is identical without it. Both path params come straight off a
-`get_sessions` entry, so pass the `cinemaId` and `sessionId` from the same
-session.
+Pass `cinemaId`, `sessionId`, `presentationSlug` and `businessDateClt` from
+the same `get_sessions` entry; all four are needed to build the
+seat-selection deep link. Use `businessDateClt` rather than the calendar date
+of `showTimeClt` — Alamo's business day runs 6:00am–5:59am, so they differ
+for post-midnight showings.
 
 Seat status maps from upstream as `EMPTY` → available and `SOLD`/`BROKEN` →
 unavailable. Grid cells that aren't seats (aisles, gaps) are omitted, as is
@@ -73,17 +121,15 @@ centered, about two-thirds of the way back from the screen, using the row and
 column indices upstream provides. Lower score is better.
 
 Neither tool holds, reserves, or books a seat — see the safety note at the
-top. `ALAMO_SEAT_URL_TEMPLATE` can override the endpoint (`{cinemaId}` and
-`{sessionId}` are substituted) if upstream ever moves it, but it is not
-required.
+top.
 
 ## Config (env)
 
-| Env                            | Default                                |
-| ------------------------------ | -------------------------------------- |
-| `ALAMO_MARKET`                 | `austin`                               |
-| `ALAMO_SCHEDULE_CACHE_TTL_SEC` | `300`                                  |
-| `ALAMO_SEAT_URL_TEMPLATE`      | the live seat endpoint (override only) |
+| Env                            | Default                 |
+| ------------------------------ | ----------------------- |
+| `ALAMO_MARKET`                 | `austin`                |
+| `ALAMO_BROWSER_CDP_URL`        | `http://localhost:9222` |
+| `ALAMO_SCHEDULE_CACHE_TTL_SEC` | `900`                   |
 
 ## Run
 

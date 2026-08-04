@@ -34,6 +34,7 @@
     "@modelcontextprotocol/sdk": "^1.30.0",
     "cockatiel": "^4.0.0",
     "p-queue": "^9.3.3",
+    "playwright-core": "^1.62.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -4,53 +4,52 @@ import path from "node:path";
 import { describe, it, mock } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { buildSeatUrl, getSeatmap, SeatFeedShapeError } from "./seatmap.ts";
+import {
+  getSeatmap,
+  SeatFeedShapeError,
+  SEATMAP_RESPONSE,
+  showUrl,
+} from "./seatmap.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name: string): unknown =>
   JSON.parse(readFileSync(path.join(__dirname, "fixtures", name), "utf8"));
 
-function makeResponse(body: unknown, ok = true, status = 200) {
-  return { json: async () => body, ok, status } as Response;
-}
+const captureOf = (body: unknown) => mock.fn(async () => body);
 
-describe("buildSeatUrl", () => {
-  it("substitutes cinemaId and sessionId into the default endpoint", () => {
+const session = {
+  businessDateClt: "2026-08-19",
+  cinemaId: "9003",
+  market: "example-market",
+  presentationSlug: "chrome-meridian",
+  sessionId: "700003",
+};
+
+describe("showUrl", () => {
+  it("builds the seat-selection deep link from schedule-feed fields", () => {
     assert.strictEqual(
-      buildSeatUrl({ cinemaId: "9003", sessionId: "700003" }),
-      "https://drafthouse.com/s/mother/v1/app/seats/9003/700003",
+      showUrl(session),
+      "https://drafthouse.com/example-market/show/chrome-meridian" +
+        "?cinemaId=9003&date=2026-08-19&sessionId=700003",
     );
   });
 
-  it("encodes both path params", () => {
+  it("encodes market and presentationSlug path segments", () => {
     assert.strictEqual(
-      buildSeatUrl({ cinemaId: "a/b", sessionId: "c d" }),
-      "https://drafthouse.com/s/mother/v1/app/seats/a%2Fb/c%20d",
-    );
-  });
-
-  it("honors an override template", () => {
-    assert.strictEqual(
-      buildSeatUrl({
-        cinemaId: "9003",
-        seatUrlTemplate: "https://example.test/{cinemaId}/x/{sessionId}",
-        sessionId: "700003",
-      }),
-      "https://example.test/9003/x/700003",
+      showUrl({ ...session, market: "a/b", presentationSlug: "c d" }),
+      "https://drafthouse.com/a%2Fb/show/c%20d" +
+        "?cinemaId=9003&date=2026-08-19&sessionId=700003",
     );
   });
 });
 
 describe("getSeatmap", () => {
   it("parses seats out of a real seat-map payload", async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse(fixture("seatmap-normal.json")),
-    );
+    const capture = captureOf(fixture("seatmap-normal.json"));
 
     const seats = await getSeatmap({
-      cinemaId: "9003",
-      fetchImpl,
-      sessionId: "700003",
+      ...session,
+      capture,
     });
 
     // 51 grid cells in the fixture, 8 of which are non-seat spacers.
@@ -66,14 +65,11 @@ describe("getSeatmap", () => {
   });
 
   it("carries row name, grid indices, and seat style through", async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse(fixture("seatmap-normal.json")),
-    );
+    const capture = captureOf(fixture("seatmap-normal.json"));
 
     const seats = await getSeatmap({
-      cinemaId: "9003",
-      fetchImpl,
-      sessionId: "700003",
+      ...session,
+      capture,
     });
 
     const seat = seats.find((s) => s.row === "1" && s.number === "15");
@@ -85,42 +81,39 @@ describe("getSeatmap", () => {
   });
 
   it("treats SOLD and BROKEN alike as unavailable", async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse({
-        data: {
-          seatingData: {
-            areas: [
-              {
-                rows: [
-                  {
-                    name: "1",
-                    seats: [
-                      {
-                        columnIndex: 0,
-                        rowIndex: 0,
-                        seatNumber: "1",
-                        seatStatus: "SOLD",
-                      },
-                      {
-                        columnIndex: 1,
-                        rowIndex: 0,
-                        seatNumber: "2",
-                        seatStatus: "BROKEN",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
+    const capture = captureOf({
+      data: {
+        seatingData: {
+          areas: [
+            {
+              rows: [
+                {
+                  name: "1",
+                  seats: [
+                    {
+                      columnIndex: 0,
+                      rowIndex: 0,
+                      seatNumber: "1",
+                      seatStatus: "SOLD",
+                    },
+                    {
+                      columnIndex: 1,
+                      rowIndex: 0,
+                      seatNumber: "2",
+                      seatStatus: "BROKEN",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
-      }),
-    );
+      },
+    });
 
     const seats = await getSeatmap({
-      cinemaId: "9003",
-      fetchImpl,
-      sessionId: "1",
+      ...session,
+      capture,
     });
 
     assert.deepStrictEqual(
@@ -130,93 +123,87 @@ describe("getSeatmap", () => {
   });
 
   it("drops an unrecognized seatStatus rather than reporting it available", async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse({
-        data: {
-          seatingData: {
-            areas: [
-              {
-                rows: [
-                  {
-                    name: "1",
-                    seats: [
-                      {
-                        columnIndex: 0,
-                        rowIndex: 0,
-                        seatNumber: "1",
-                        seatStatus: "SOME_NEW_STATUS",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
+    const capture = captureOf({
+      data: {
+        seatingData: {
+          areas: [
+            {
+              rows: [
+                {
+                  name: "1",
+                  seats: [
+                    {
+                      columnIndex: 0,
+                      rowIndex: 0,
+                      seatNumber: "1",
+                      seatStatus: "SOME_NEW_STATUS",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
-      }),
-    );
+      },
+    });
 
     const seats = await getSeatmap({
-      cinemaId: "9003",
-      fetchImpl,
-      sessionId: "1",
+      ...session,
+      capture,
     });
 
     assert.deepStrictEqual(seats, []);
   });
 
   it('skips a row with no usable name rather than emitting seats labelled ""', async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse({
-        data: {
-          seatingData: {
-            areas: [
-              {
-                rows: [
-                  {
-                    seats: [
-                      {
-                        columnIndex: 0,
-                        rowIndex: 0,
-                        seatNumber: "1",
-                        seatStatus: "EMPTY",
-                      },
-                    ],
-                  },
-                  {
-                    name: " ".repeat(3),
-                    seats: [
-                      {
-                        columnIndex: 0,
-                        rowIndex: 1,
-                        seatNumber: "1",
-                        seatStatus: "EMPTY",
-                      },
-                    ],
-                  },
-                  {
-                    name: "3",
-                    seats: [
-                      {
-                        columnIndex: 0,
-                        rowIndex: 2,
-                        seatNumber: "1",
-                        seatStatus: "EMPTY",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
+    const capture = captureOf({
+      data: {
+        seatingData: {
+          areas: [
+            {
+              rows: [
+                {
+                  seats: [
+                    {
+                      columnIndex: 0,
+                      rowIndex: 0,
+                      seatNumber: "1",
+                      seatStatus: "EMPTY",
+                    },
+                  ],
+                },
+                {
+                  name: " ".repeat(3),
+                  seats: [
+                    {
+                      columnIndex: 0,
+                      rowIndex: 1,
+                      seatNumber: "1",
+                      seatStatus: "EMPTY",
+                    },
+                  ],
+                },
+                {
+                  name: "3",
+                  seats: [
+                    {
+                      columnIndex: 0,
+                      rowIndex: 2,
+                      seatNumber: "1",
+                      seatStatus: "EMPTY",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
-      }),
-    );
+      },
+    });
 
     const seats = await getSeatmap({
-      cinemaId: "9003",
-      fetchImpl,
-      sessionId: "1",
+      ...session,
+      capture,
     });
 
     assert.deepStrictEqual(
@@ -225,67 +212,34 @@ describe("getSeatmap", () => {
     );
   });
 
-  it("requests the URL built from cinemaId and sessionId", async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse(fixture("seatmap-normal.json")),
-    );
+  it("navigates to the seat-selection deep link and matches the seats response", async () => {
+    const capture = captureOf(fixture("seatmap-normal.json"));
 
-    await getSeatmap({ cinemaId: "9003", fetchImpl, sessionId: "700003" });
+    await getSeatmap({ ...session, capture });
 
-    const [call] = fetchImpl.mock.calls;
+    const [call] = capture.mock.calls;
     assert.ok(call);
     assert.deepStrictEqual(call.arguments, [
-      "https://drafthouse.com/s/mother/v1/app/seats/9003/700003",
+      { match: SEATMAP_RESPONSE, url: showUrl(session) },
     ]);
   });
 
   it("throws SeatFeedShapeError when the seatingData.areas spine is missing", async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse(fixture("seatmap-malformed.json")),
-    );
+    const capture = captureOf(fixture("seatmap-malformed.json"));
 
     await assert.rejects(
-      getSeatmap({ cinemaId: "9003", fetchImpl, sessionId: "700003" }),
+      getSeatmap({ ...session, capture }),
       SeatFeedShapeError,
     );
   });
 
   it("throws SeatFeedShapeError when a row is missing its seats array", async () => {
-    const fetchImpl = mock.fn(async () =>
-      makeResponse({
-        data: { seatingData: { areas: [{ rows: [{ name: "1" }] }] } },
-      }),
-    );
+    const capture = captureOf({
+      data: { seatingData: { areas: [{ rows: [{ name: "1" }] }] } },
+    });
 
     await assert.rejects(
-      getSeatmap({ cinemaId: "9003", fetchImpl, sessionId: "1" }),
-      SeatFeedShapeError,
-    );
-  });
-
-  it("throws a plain error on non-2xx response", async () => {
-    const fetchImpl = mock.fn(async () => makeResponse({}, false, 503));
-
-    await assert.rejects(
-      getSeatmap({ cinemaId: "9003", fetchImpl, sessionId: "1" }),
-      /HTTP 503/,
-    );
-  });
-
-  it("throws SeatFeedShapeError (not a raw SyntaxError) when a 2xx response body is not valid JSON", async () => {
-    const fetchImpl = mock.fn(
-      async () =>
-        ({
-          json: async () => {
-            throw new SyntaxError("Unexpected token < in JSON at position 0");
-          },
-          ok: true,
-          status: 200,
-        }) as unknown as Response,
-    );
-
-    await assert.rejects(
-      getSeatmap({ cinemaId: "9003", fetchImpl, sessionId: "1" }),
+      getSeatmap({ ...session, capture }),
       SeatFeedShapeError,
     );
   });

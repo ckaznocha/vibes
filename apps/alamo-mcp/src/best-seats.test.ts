@@ -12,6 +12,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name: string): unknown =>
   JSON.parse(readFileSync(path.join(__dirname, "fixtures", name), "utf8"));
 
+const captureOf = (body: unknown) => mock.fn(async () => body);
+
+const session = {
+  businessDateClt: "2026-08-19",
+  cinemaId: "9003",
+  market: "example-market",
+  presentationSlug: "chrome-meridian",
+  sessionId: "700003",
+};
+
 const seat = (
   over: Partial<Seat> & Pick<Seat, "columnIndex" | "rowIndex">,
 ) => ({
@@ -92,18 +102,9 @@ describe("scoreSeats", () => {
 
 describe("bestSeats", () => {
   it("returns the top N scored seats from a real seat-map payload", async () => {
-    const fetchImpl = mock.fn(async () => ({
-      json: async () => fixture("seatmap-normal.json"),
-      ok: true,
-      status: 200,
-    }));
+    const capture = captureOf(fixture("seatmap-normal.json"));
 
-    const result = await bestSeats({
-      cinemaId: "9003",
-      count: 3,
-      fetchImpl: fetchImpl as unknown as typeof fetch,
-      sessionId: "700003",
-    });
+    const result = await bestSeats({ ...session, capture, count: 3 });
 
     assert.strictEqual(result.length, 3);
     // Scores must be non-decreasing — best seat first.
@@ -116,35 +117,21 @@ describe("bestSeats", () => {
   });
 
   it("defaults to a single seat", async () => {
-    const fetchImpl = mock.fn(async () => ({
-      json: async () => fixture("seatmap-normal.json"),
-      ok: true,
-      status: 200,
-    }));
+    const capture = captureOf(fixture("seatmap-normal.json"));
 
-    const result = await bestSeats({
-      cinemaId: "9003",
-      fetchImpl: fetchImpl as unknown as typeof fetch,
-      sessionId: "700003",
-    });
+    const result = await bestSeats({ ...session, capture });
 
     assert.strictEqual(result.length, 1);
   });
 
-  it("propagates a fetch failure from getSeatmap", async () => {
-    const fetchImpl = mock.fn(async () => ({
-      json: async () => ({}),
-      ok: false,
-      status: 503,
-    }));
+  it("propagates a capture failure from getSeatmap", async () => {
+    const capture = mock.fn(async () => {
+      throw new Error("no matching response captured");
+    });
 
     await assert.rejects(
-      bestSeats({
-        cinemaId: "9003",
-        fetchImpl: fetchImpl as unknown as typeof fetch,
-        sessionId: "700003",
-      }),
-      /HTTP 503/,
+      bestSeats({ ...session, capture }),
+      /no matching response captured/,
     );
   });
 });

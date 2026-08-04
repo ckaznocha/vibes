@@ -1,3 +1,5 @@
+import type { CaptureJson } from "./browser.ts";
+
 import { createTtlCache } from "./cache.ts";
 
 export interface Cinema {
@@ -23,6 +25,12 @@ export interface ScheduleFeed {
   sessions: Session[];
 }
 export interface Session {
+  /**
+   * Alamo's business day, which runs 6:00am-5:59am and therefore differs from the
+   * calendar date of `showTimeClt` for post-midnight showings. The seat-selection deep
+   * link keys off this, so it must not be derived from `showTimeClt`.
+   */
+  businessDateClt?: string;
   cinemaId: string;
   id?: string;
   presentationSlug: string;
@@ -36,14 +44,15 @@ export class ScheduleFeedError extends Error {
   }
 }
 
-export function createScheduleFetcher(
-  options: {
-    fetchImpl?: typeof fetch;
-    nowImpl?: () => number;
-    ttlSec?: number;
-  } = {},
-): (market: string) => Promise<ScheduleFeed> {
-  const { fetchImpl = fetch, nowImpl, ttlSec = 300 } = options;
+/** The market landing page fetches this for itself as soon as it loads. */
+export const SCHEDULE_RESPONSE = /\/s\/mother\/v2\/schedule\/market\//;
+
+export function createScheduleFetcher(options: {
+  capture: CaptureJson;
+  nowImpl?: () => number;
+  ttlSec?: number;
+}): (market: string) => Promise<ScheduleFeed> {
+  const { capture, nowImpl, ttlSec = 900 } = options;
   const cache = createTtlCache<ScheduleFeed>({
     ttlSec,
     ...(nowImpl !== undefined && { nowImpl }),
@@ -53,26 +62,18 @@ export function createScheduleFetcher(
     const cached = cache.get(market);
     if (cached) return cached;
 
-    const url = `https://drafthouse.com/s/mother/v2/schedule/market/${encodeURIComponent(market)}`;
-    const response = await fetchImpl(url);
-    if (!response.ok) {
-      throw new Error(
-        `alamo schedule fetch failed: HTTP ${String(response.status)} for ${url}`,
-      );
-    }
-
-    let raw: unknown;
-    try {
-      raw = await response.json();
-    } catch {
-      throw new ScheduleFeedError(
-        `alamo schedule fetch returned a non-JSON response body for ${url}`,
-      );
-    }
+    const raw = await capture({
+      match: SCHEDULE_RESPONSE,
+      url: marketUrl(market),
+    });
     const feed = parseFeed(raw);
     cache.set(market, feed);
     return feed;
   };
+}
+
+export function marketUrl(market: string): string {
+  return `https://drafthouse.com/${encodeURIComponent(market)}`;
 }
 
 function isValidCinema(c: unknown): c is Cinema {
