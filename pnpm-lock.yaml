@@ -86,8 +86,8 @@ importers:
         specifier: ^73.0.0
         version: 73.0.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))
       globals:
-        specifier: ^17.8.0
-        version: 17.8.0
+        specifier: ^17.9.0
+        version: 17.9.0
       jiti:
         specifier: ^2.7.0
         version: 2.7.0
@@ -2890,10 +2890,6 @@ packages:
 
   globals@15.15.0:
     resolution: {integrity: sha512-7ACyT3wmyp3I61S4fG682L0VA2RGD9otkqGJIwNUMF1SWUombIIk+af1unuDYgMm082aHYwD+mzJvv9Iu8dsgg==}
-    engines: {node: '>=18'}
-
-  globals@17.8.0:
-    resolution: {integrity: sha512-Zz/LMDZScFmkakeL2cTHzf+PbWKdpU3uclqkZT7TjDG58j5WPt0PpA+n9uPI24fZtlw07q0OtEi84K+umsRzqQ==}
     engines: {node: '>=18'}
 
   globals@17.9.0:
@@ -6847,7 +6843,7 @@ snapshots:
       bytes: 3.1.2
       eslint: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
       functional-red-black-tree: 1.0.1
-      globals: 17.8.0
+      globals: 17.9.0
       jsx-ast-utils-x: 0.1.0
       lodash.merge: 4.6.2
       minimatch: 10.2.5
@@ -7206,8 +7202,6 @@ snapshots:
       path-is-absolute: 1.0.1
 
   globals@15.15.0: {}
-
-  globals@17.8.0: {}
 
   globals@17.9.0: {}
 
