@@ -5,7 +5,9 @@ const clientCache: { apiKey: string | undefined; client: TMDB | undefined } = {
   client: undefined,
 };
 
-/** Test-only: clears the cached TMDB client so tests can start fresh. */
+/**
+ * Test-only: clears the cached TMDB client so tests can start fresh.
+ */
 export function _resetTmdbClientCacheForTests(): void {
   clientCache.client = undefined;
   clientCache.apiKey = undefined;
