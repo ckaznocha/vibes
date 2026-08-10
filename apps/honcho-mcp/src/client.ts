@@ -7,7 +7,9 @@ const clientCache: { client: Honcho | undefined; key: string | undefined } = {
   key: undefined,
 };
 
-/** Test-only: clears the cached Honcho client so tests can start fresh. */
+/**
+ * Test-only: clears the cached Honcho client so tests can start fresh.
+ */
 export function _resetHonchoClientCacheForTests(): void {
   clientCache.client = undefined;
   clientCache.key = undefined;

@@ -16,16 +16,24 @@ export interface GetSeatmapOptions {
 }
 
 export interface Seat {
-  /** Column position within the row, left to right. Used for center-of-house scoring. */
+  /**
+   * Column position within the row, left to right. Used for center-of-house scoring.
+   */
   columnIndex: number;
-  /** e.g. "RECLINER" — absent when upstream sends none. */
+  /**
+   * e.g. "RECLINER" — absent when upstream sends none.
+   */
   description?: string;
   number: string;
   row: string;
-  /** Row position, 0 = closest to the screen. Used for center-of-house scoring. */
+  /**
+   * Row position, 0 = closest to the screen. Used for center-of-house scoring.
+   */
   rowIndex: number;
   status: "available" | "unavailable";
-  /** "NORMAL" | "HANDICAP" | "COMPANION" as sent by upstream. */
+  /**
+   * "NORMAL" | "HANDICAP" | "COMPANION" as sent by upstream.
+   */
   style?: string;
 }
 

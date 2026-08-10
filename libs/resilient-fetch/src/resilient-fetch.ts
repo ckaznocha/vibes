@@ -9,9 +9,13 @@ import {
 const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 export interface ResilientFetchOptions extends ResilienceOptions {
-  /** Underlying fetch implementation to wrap. Defaults to the global `fetch`. */
+  /**
+   * Underlying fetch implementation to wrap. Defaults to the global `fetch`.
+   */
   fetchImpl?: typeof fetch;
-  /** Additionally treat these HTTP statuses as transient. Merged with the built-in set. */
+  /**
+   * Additionally treat these HTTP statuses as transient. Merged with the built-in set.
+   */
   retryableStatuses?: Iterable<number>;
   throttle?: ThrottleOptions;
 }

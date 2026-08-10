@@ -11,9 +11,13 @@ import {
 } from "cockatiel";
 
 export interface CircuitBreakerOptions {
-  /** Consecutive matching failures before the circuit opens. Defaults to 5. */
+  /**
+   * Consecutive matching failures before the circuit opens. Defaults to 5.
+   */
   consecutiveFailures?: number;
-  /** How long to wait before probing a half-open circuit again. Defaults to 30_000. */
+  /**
+   * How long to wait before probing a half-open circuit again. Defaults to 30_000.
+   */
   halfOpenAfterMs?: number;
 }
 
@@ -27,25 +31,39 @@ export interface ResilienceOptions {
    */
   isRetryableError?: (error: unknown) => boolean;
   retry?: RetryOptions;
-  /** Per-attempt timeout in milliseconds. Defaults to 15_000. */
+  /**
+   * Per-attempt timeout in milliseconds. Defaults to 15_000.
+   */
   timeoutMs?: number;
 }
 
 export interface RetryOptions {
-  /** Initial backoff delay in milliseconds. Defaults to 250. */
+  /**
+   * Initial backoff delay in milliseconds. Defaults to 250.
+   */
   initialDelayMs?: number;
-  /** Maximum number of attempts, including the first. Defaults to 3. */
+  /**
+   * Maximum number of attempts, including the first. Defaults to 3.
+   */
   maxAttempts?: number;
-  /** Maximum backoff delay in milliseconds. Defaults to 10_000. */
+  /**
+   * Maximum backoff delay in milliseconds. Defaults to 10_000.
+   */
   maxDelayMs?: number;
 }
 
 export interface ThrottleOptions {
-  /** Maximum concurrent in-flight calls. Defaults to 4. */
+  /**
+   * Maximum concurrent in-flight calls. Defaults to 4.
+   */
   concurrency?: number;
-  /** Maximum calls allowed within `intervalMs`. Unset means unbounded. */
+  /**
+   * Maximum calls allowed within `intervalMs`. Unset means unbounded.
+   */
   intervalCap?: number;
-  /** Window, in milliseconds, that `intervalCap` applies to. Defaults to 1000. */
+  /**
+   * Window, in milliseconds, that `intervalCap` applies to. Defaults to 1000.
+   */
   intervalMs?: number;
 }
 
