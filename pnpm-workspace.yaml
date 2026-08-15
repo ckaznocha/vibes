@@ -2,7 +2,12 @@ packages:
   - "apps/*"
   - "libs/*"
 minimumReleaseAge: 1440
-verifyDepsBeforeRun: error
+# `install`, not `error`: a fresh git worktree has no node_modules, and `error`
+# makes every pnpm command in it fail with "Run pnpm install" until you do it by
+# hand. `install` just performs the install, so a new worktree is usable
+# immediately. It is still a hard sync check — it never silently runs against
+# out-of-date node_modules.
+verifyDepsBeforeRun: install
 strictDepBuilds: true
 allowBuilds:
   "@swc/core": true

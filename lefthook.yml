@@ -1,13 +1,22 @@
+# Every `run:` goes through `mise exec --` on purpose. mise is activated from
+# .zshrc, which only interactive shells source, so a git hook fired from a GUI
+# client, an editor, or a coding agent gets whatever `pnpm` is first on PATH
+# instead of the version pinned in package.json's `packageManager`. On macOS
+# that is typically a Homebrew pnpm, which then tries to self-switch to the
+# pinned version and dies with "Cannot verify the identity of the
+# @pnpm/exe.<platform> native binary" — @pnpm/exe has shipped no macos-x64
+# build since 11.0.4, so on an Intel Mac that switch can never succeed.
+# `mise exec --` pins the toolchain regardless of how the shell was started.
 pre-commit:
   parallel: false
   commands:
     lint:
       glob: "*.ts"
-      run: pnpm exec eslint --fix {staged_files}
+      run: mise exec -- pnpm exec eslint --fix {staged_files}
       stage_fixed: true
     format:
       glob: "*.{ts,json,md,yml,yaml}"
-      run: pnpm exec prettier --write {staged_files}
+      run: mise exec -- pnpm exec prettier --write {staged_files}
       stage_fixed: true
     affected-checks:
       glob: "{apps,libs}/**/*.ts"
@@ -19,11 +28,11 @@ pre-commit:
       # (breaks tsc/node --test the moment 2+ projects' files are staged together).
       # --uncommitted has nx compute the changed-file list itself from git, sidestepping
       # lefthook's templating entirely.
-      run: pnpm exec nx affected -t typecheck,test --uncommitted
+      run: mise exec -- pnpm exec nx affected -t typecheck,test --uncommitted
     workspace-lint:
       glob: "{package.json,pnpm-workspace.yaml,pnpm-lock.yaml,**/package.json}"
-      run: pnpm run lint:workspace
+      run: mise exec -- pnpm run lint:workspace
     readme-table:
       glob: "{apps,libs}/*/{project.json,package.json}"
-      run: pnpm run docs:table
+      run: mise exec -- pnpm run docs:table
       stage_fixed: true
