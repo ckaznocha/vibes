@@ -88,9 +88,11 @@ updates:
     commit-message:
       prefix: "automated"
       include: "scope"
+    # No `semver-major-days` here: the semver-* cooldown keys are valid only for
+    # package managers that support SemVer, and Dependabot rejects the entire
+    # config file if one appears under this ecosystem.
     cooldown:
       default-days: 3
-      semver-major-days: 7
     groups:
       github-actions:
         applies-to: version-updates
@@ -123,9 +125,11 @@ updates:
     commit-message:
       prefix: "automated"
       include: "scope"
+    # No `semver-major-days` here: the semver-* cooldown keys are valid only for
+    # package managers that support SemVer, and Dependabot rejects the entire
+    # config file if one appears under this ecosystem.
     cooldown:
       default-days: 3
-      semver-major-days: 7
     groups:
       devcontainers:
         applies-to: version-updates

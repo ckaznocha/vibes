@@ -12,7 +12,12 @@ jobs:
   auto-merge:
     # Never checks out or executes PR code — it only reads metadata and calls the
     # API, which is what makes pull_request_target safe here.
-    if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    # Gated on the PR *author*, deliberately not on github.actor: on a
+    # `synchronize` event the actor is whoever pushed, so clicking "Update
+    # branch" on a Dependabot PR makes the actor a human and an actor check
+    # skips the job — leaving that PR permanently without auto-merge. The
+    # author is the fact that actually matters and it is stable across events.
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write
