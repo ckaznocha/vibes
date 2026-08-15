@@ -58,10 +58,22 @@ updates:
           - "@nx/*"
         update-types:
           - "major"
+      # Nx is split out of the security group for the same reason it is split
+      # out of the version groups. Since the auto-merge workflow blocks any PR
+      # containing nx, leaving nx in the general security group would let one
+      # nx advisory hold up every unrelated security fix batched with it.
+      nx-security:
+        applies-to: security-updates
+        patterns:
+          - "nx"
+          - "@nx/*"
       npm-security:
         applies-to: security-updates
         patterns:
           - "*"
+        exclude-patterns:
+          - "nx"
+          - "@nx/*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -117,5 +129,18 @@ updates:
     groups:
       devcontainers:
         applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      devcontainers-major:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+      devcontainers-security:
+        applies-to: security-updates
         patterns:
           - "*"
