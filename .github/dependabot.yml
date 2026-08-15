@@ -1,35 +1,121 @@
+---
+# Noise policy for this repo:
+#   * Version updates run once a week, Sunday morning (America/Los_Angeles).
+#   * Everything is grouped, split only by risk: one "safe" PR (minor + patch,
+#     auto-merged by .github/workflows/dependabot-auto-merge.yml once CI is
+#     green) and one "major" PR per ecosystem that you actually read.
+#   * `cooldown` holds back releases for a few days so freshly-published
+#     broken/compromised versions age out before they reach a PR here.
+#   * Security updates are exempt from the schedule (they open immediately) but
+#     are still grouped so a multi-CVE day is one PR, not fifteen.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "America/Los_Angeles"
+    open-pull-requests-limit: 5
     assignees:
-      - ckaznocha
-    reviewers:
       - ckaznocha
     commit-message:
       prefix: "automated"
       include: "scope"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+    groups:
+      # Nx is deliberately its own group and is excluded from auto-merge (see
+      # dependabot-auto-merge.yml): bumping nx/@nx/* is not a lockfile edit,
+      # it needs `nx migrate` to run the version's migrations, or workspace
+      # config silently drifts out of sync with the installed version.
+      # Note this is a *group*, not an `ignore` — per GitHub's options
+      # reference, `ignore` applies to security updates too, so ignoring nx
+      # here would suppress nx security PRs as well.
+      nx:
+        applies-to: version-updates
+        patterns:
+          - "nx"
+          - "@nx/*"
+      npm:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "nx"
+          - "@nx/*"
+        update-types:
+          - "minor"
+          - "patch"
+      npm-major:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "nx"
+          - "@nx/*"
+        update-types:
+          - "major"
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "America/Los_Angeles"
+    open-pull-requests-limit: 5
     assignees:
-      - ckaznocha
-    reviewers:
       - ckaznocha
     commit-message:
       prefix: "automated"
       include: "scope"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+    groups:
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      github-actions-major:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+      github-actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "America/Los_Angeles"
+    open-pull-requests-limit: 5
     assignees:
-      - ckaznocha
-    reviewers:
       - ckaznocha
     commit-message:
       prefix: "automated"
       include: "scope"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+    groups:
+      devcontainers:
+        applies-to: version-updates
+        patterns:
+          - "*"
