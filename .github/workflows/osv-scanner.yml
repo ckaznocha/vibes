@@ -5,7 +5,9 @@ on:
   merge_group:
     types: [checks_requested]
   schedule:
-    - cron: "12 12 * * 1"
+    # Sunday, shortly after Dependabot's weekly run (06:00 America/Los_Angeles,
+    # see .github/dependabot.yml) so all dependency noise lands in one window.
+    - cron: "12 14 * * 0"
   push:
     branches: ["main"]
 permissions: read-all

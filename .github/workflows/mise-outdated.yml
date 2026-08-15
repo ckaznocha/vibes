@@ -1,7 +1,9 @@
 name: Mise Outdated Check
 on:
   schedule:
-    - cron: "0 12 * * 1"
+    # Sunday, shortly after Dependabot's weekly run (06:00 America/Los_Angeles,
+    # see .github/dependabot.yml) so all dependency noise lands in one window.
+    - cron: "0 14 * * 0"
   workflow_dispatch:
 permissions:
   contents: read

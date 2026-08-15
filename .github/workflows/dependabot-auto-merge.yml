@@ -1,0 +1,54 @@
+---
+# Enables auto-merge on Dependabot PRs that carry no major bump, so they land on
+# their own once the required `affected` check goes green. Majors are left alone
+# for a human to read. See .github/dependabot.yml for the grouping policy.
+name: Dependabot auto-merge
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+permissions:
+  contents: read
+jobs:
+  auto-merge:
+    # Never checks out or executes PR code — it only reads metadata and calls the
+    # API, which is what makes pull_request_target safe here.
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check for Nx packages
+        id: nx
+        # Any nx/@nx/* bump needs `nx migrate` run against it, so it stays
+        # manual no matter the semver level or whether it is a security fix.
+        env:
+          DEP_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+        run: |
+          set -euo pipefail
+          found=false
+          # `[:blank:]` not `[:space:]` — the latter eats the newlines this
+          # loop splits on, leaving one unterminated line that `read` drops.
+          while IFS= read -r dep || [ -n "$dep" ]; do
+            case "$dep" in
+              nx | @nx/*) found=true ;;
+            esac
+          done < <(echo "$DEP_NAMES" | tr ',' '\n' | tr -d '[:blank:]')
+          echo "found=$found" >> "$GITHUB_OUTPUT"
+      - name: Enable auto-merge
+        # For a grouped PR, update-type is the highest bump in the group, so a
+        # single major in the batch keeps the whole PR manual.
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major' && steps.nx.outputs.found == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR_URL"
