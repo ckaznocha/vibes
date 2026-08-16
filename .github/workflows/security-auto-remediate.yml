@@ -25,6 +25,13 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# A scheduled run and a manual dispatch can otherwise overlap, and both
+# force-update the same branch and edit the same PR body. Queue instead of
+# cancel: a run interrupted between `git push` and `gh pr edit` would leave the
+# branch updated but the PR describing the previous state.
+concurrency:
+  group: security-auto-remediate
+  cancel-in-progress: false
 jobs:
   remediate:
     runs-on: ubuntu-latest
@@ -95,7 +102,21 @@ jobs:
           git checkout -B "$BRANCH"
           git add pnpm-workspace.yaml pnpm-lock.yaml
           git commit -m "fix(security): apply pnpm overrides for transitive advisories"
-          git push --force-with-lease origin "$BRANCH"
+
+          # actions/checkout only fetches the triggering ref, so no
+          # remote-tracking ref exists for $BRANCH. A bare --force-with-lease
+          # has nothing to compare against and rejects with "stale info" on
+          # every run after the first, which would silently stop this job from
+          # ever updating the PR. Fetch the branch and pass the expected value
+          # explicitly: that keeps the lease meaningful — a competing push
+          # between our fetch and ours still rejects — rather than degrading to
+          # a bare --force.
+          push_args=(origin "HEAD:refs/heads/$BRANCH")
+          if git fetch -q origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" 2>/dev/null; then
+            expected=$(git rev-parse "refs/remotes/origin/$BRANCH")
+            push_args=(--force-with-lease="refs/heads/$BRANCH:$expected" "${push_args[@]}")
+          fi
+          git push "${push_args[@]}"
 
           if [ "$VERIFY" = "success" ]; then
             verdict="✅ build, typecheck, test and lint all passed in this job"
