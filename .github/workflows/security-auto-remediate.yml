@@ -1,0 +1,180 @@
+---
+# Transitive vulnerabilities cannot be fixed by bumping a manifest — nothing in
+# any package.json names them. pnpm's own remediation writes `overrides` into
+# pnpm-workspace.yaml instead, which is what this job automates.
+#
+# Dependabot already covers *direct* dependencies: its security updates open
+# PRs that dependabot-auto-merge.yml lands unattended. This job exists purely
+# for the transitive-only case Dependabot structurally cannot reach.
+#
+# Deliberately NOT fully hands-off. The PR is opened with GITHUB_TOKEN, and
+# GitHub does not fire `pull_request` events for tokens' own PRs (anti-
+# recursion), so the required `affected` check stays idle until a human
+# touches the PR. That is the intended design here rather than a limitation
+# worked around: `pnpm audit --fix override` also writes
+# `minimumReleaseAgeExclude` entries that push patched versions past this
+# repo's 1440-minute cooldown, so a fully automatic path could land a release
+# minutes old — exactly what that cooldown exists to prevent. A human glances
+# at the diff, clicks "Update branch", and CI runs for real.
+name: Security Auto-Remediate
+on:
+  schedule:
+    # Sunday, in the same window as the Dependabot run and the other scheduled
+    # dependency jobs, so all of this noise arrives at once.
+    - cron: "30 14 * * 0"
+  workflow_dispatch:
+permissions:
+  contents: read
+# A scheduled run and a manual dispatch can otherwise overlap, and both
+# force-update the same branch and edit the same PR body. Queue instead of
+# cancel: a run interrupted between `git push` and `gh pr edit` would leave the
+# branch updated but the PR describing the previous state.
+concurrency:
+  group: security-auto-remediate
+  cancel-in-progress: false
+jobs:
+  remediate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+      BRANCH: automated/security-overrides
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+
+      - name: Record advisories before remediation
+        id: before
+        run: |
+          set -uo pipefail
+          # `pnpm audit` exits non-zero when it finds anything, which is the
+          # normal case here — don't let that end the job.
+          pnpm audit 2>&1 | tail -40 > /tmp/audit-before.txt || true
+          cat /tmp/audit-before.txt
+
+      - name: Apply pnpm security overrides
+        id: fix
+        run: |
+          set -uo pipefail
+          pnpm audit --fix override 2>&1 | tee /tmp/fix.log || true
+          if git diff --quiet -- pnpm-workspace.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No new overrides needed."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install with new overrides
+        if: steps.fix.outputs.changed == 'true'
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Verify the workspace still builds and passes
+        id: verify
+        if: steps.fix.outputs.changed == 'true'
+        continue-on-error: true
+        run: pnpm exec nx run-many -t build,typecheck,test,lint
+
+      - name: Confirm the advisories are actually gone
+        id: after
+        if: steps.fix.outputs.changed == 'true'
+        run: |
+          set -uo pipefail
+          pnpm audit 2>&1 | tail -40 > /tmp/audit-after.txt || true
+          cat /tmp/audit-after.txt
+
+      - name: Open or update the remediation PR
+        if: steps.fix.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERIFY: ${{ steps.verify.outcome }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add pnpm-workspace.yaml pnpm-lock.yaml
+          git commit -m "fix(security): apply pnpm overrides for transitive advisories"
+
+          # actions/checkout only fetches the triggering ref, so no
+          # remote-tracking ref exists for $BRANCH. A bare --force-with-lease
+          # has nothing to compare against and rejects with "stale info" on
+          # every run after the first, which would silently stop this job from
+          # ever updating the PR. Fetch the branch and pass the expected value
+          # explicitly: that keeps the lease meaningful — a competing push
+          # between our fetch and ours still rejects — rather than degrading to
+          # a bare --force.
+          push_args=(origin "HEAD:refs/heads/$BRANCH")
+          if git fetch -q origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" 2>/dev/null; then
+            expected=$(git rev-parse "refs/remotes/origin/$BRANCH")
+            push_args=(--force-with-lease="refs/heads/$BRANCH:$expected" "${push_args[@]}")
+          fi
+          git push "${push_args[@]}"
+
+          if [ "$VERIFY" = "success" ]; then
+            verdict="✅ build, typecheck, test and lint all passed in this job"
+          else
+            verdict="❌ **verification FAILED in this job** — review carefully before merging"
+          fi
+
+          {
+            echo "Automated by \`.github/workflows/security-auto-remediate.yml\`."
+            echo
+            echo "\`pnpm audit --fix override\` found transitive advisories with no manifest-level"
+            echo "fix and wrote \`overrides\` into \`pnpm-workspace.yaml\`."
+            echo
+            echo "## Verification in this job"
+            echo
+            echo "$verdict"
+            echo
+            echo "## Advisories before"
+            echo
+            echo '```'
+            cat /tmp/audit-before.txt
+            echo '```'
+            echo
+            echo "## Advisories after"
+            echo
+            echo '```'
+            cat /tmp/audit-after.txt
+            echo '```'
+            echo
+            echo "## What you need to do"
+            echo
+            echo "The checks on this PR are **idle and will stay that way**. GitHub does not fire"
+            echo "\`pull_request\` events for PRs opened with \`GITHUB_TOKEN\`, so the required"
+            echo "\`affected\` check never starts on its own."
+            echo
+            echo "Click **Update branch**, which makes you the actor and triggers CI for real, then"
+            echo "merge once it is green."
+            echo
+            echo "This step is deliberate. The fix above also adds \`minimumReleaseAgeExclude\`"
+            echo "entries so patched versions bypass this repo's 1440-minute cooldown — a control"
+            echo "meant to blunt compromised releases. A human look before merge is the tradeoff"
+            echo "for keeping that protection meaningful."
+          } > /tmp/pr-body.md
+
+          if gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
+            gh pr edit "$BRANCH" --body-file /tmp/pr-body.md
+            echo "Updated existing PR."
+          else
+            gh pr create \
+              --title "fix(security): apply pnpm overrides for transitive advisories" \
+              --body-file /tmp/pr-body.md \
+              --base main \
+              --head "$BRANCH" \
+              --assignee ckaznocha
+          fi
+
+      - name: Fail the run if verification failed
+        if: steps.fix.outputs.changed == 'true' && steps.verify.outcome != 'success'
+        run: |
+          echo "The remediation PR was opened, but build/typecheck/test/lint failed against it."
+          exit 1
