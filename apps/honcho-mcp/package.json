@@ -32,11 +32,11 @@
     "node": ">=24"
   },
   "dependencies": {
-    "@honcho-ai/sdk": "^2.3.0",
+    "@honcho-ai/sdk": "^2.4.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "cockatiel": "^4.0.0",
     "p-queue": "^9.3.3",
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@ckaznocha/mcp-tool-result": "workspace:*",
