@@ -35,7 +35,7 @@
     "cockatiel": "^4.0.0",
     "p-queue": "^9.3.3",
     "tmdb-ts": "^2.3.0",
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@ckaznocha/mcp-tool-result": "workspace:*",
